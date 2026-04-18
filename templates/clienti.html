@@ -73,8 +73,22 @@
       <tr style="cursor:pointer;" onclick="location.href='{{ url_for('modifica_cliente', id=c.id) }}'">
         <td class="fw-semibold">{{ c.cognome }} {{ c.nome }}</td>
         <td class="font-monospace small">{{ c.codice_fiscale or '—' }}</td>
-        <td>{{ c.citta or '—' }}{% if c.provincia %} ({{ c.provincia }}){% endif %}</td>
-        <td>{{ c.telefono or '—' }}</td>
+        <td>
+          {% if c.indirizzo or c.citta %}
+          <a href="https://maps.apple.com/?q={{ ((c.indirizzo or '') + ' ' + (c.citta or ''))|urlencode }}"
+             class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+            <i class="bi bi-geo-alt text-danger"></i>
+            {{ c.citta or '—' }}{% if c.provincia %} ({{ c.provincia }}){% endif %}
+          </a>
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if c.telefono %}
+          <a href="tel:{{ c.telefono|replace(' ','') }}" class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+            <i class="bi bi-telephone text-success"></i> {{ c.telefono }}
+          </a>
+          {% else %}—{% endif %}
+        </td>
         <td class="small">{{ c.asl_competente or '—' }}</td>
         <td class="small">{{ c.centro or '—' }}</td>
         <td class="text-end" onclick="event.stopPropagation()">
@@ -109,9 +123,26 @@
             {% if c.codice_fiscale %}<span class="font-monospace">{{ c.codice_fiscale }}</span>{% endif %}
           </div>
           <div class="d-flex flex-wrap gap-2 mt-2" style="font-size:.82rem;">
-            {% if c.citta %}<span><i class="bi bi-geo-alt text-secondary"></i> {{ c.citta }}{% if c.provincia %} ({{ c.provincia }}){% endif %}</span>{% endif %}
-            {% if c.telefono %}<span><i class="bi bi-telephone text-secondary"></i> {{ c.telefono }}</span>{% endif %}
-            {% if c.centro %}<span><i class="bi bi-hospital text-secondary"></i> {{ c.centro }}</span>{% endif %}
+            {% if c.indirizzo or c.citta %}
+            <a href="https://maps.apple.com/?q={{ ((c.indirizzo or '') + ' ' + (c.citta or ''))|urlencode }}"
+               class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+              <i class="bi bi-geo-alt text-danger"></i>
+              {{ c.citta or '' }}{% if c.provincia %} ({{ c.provincia }}){% endif %}
+            </a>
+            {% endif %}
+            {% if c.telefono %}
+            <a href="tel:{{ c.telefono|replace(' ','') }}"
+               class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+              <i class="bi bi-telephone text-success"></i> {{ c.telefono }}
+            </a>
+            {% endif %}
+            {% if c.email %}
+            <a href="mailto:{{ c.email }}"
+               class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+              <i class="bi bi-envelope text-primary"></i> {{ c.email }}
+            </a>
+            {% endif %}
+            {% if c.centro %}<span class="text-body-secondary"><i class="bi bi-hospital"></i> {{ c.centro }}</span>{% endif %}
           </div>
         </div>
       </div>

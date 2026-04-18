@@ -144,6 +144,11 @@
             {% if p.data_apertura %}
             <span><i class="bi bi-calendar text-secondary"></i> {{ p.data_apertura }}</span>
             {% endif %}
+            {% if p.telefono %}
+            <a href="tel:{{ p.telefono|replace(' ','') }}" class="text-decoration-none text-body-secondary" onclick="event.stopPropagation()">
+              <i class="bi bi-telephone text-success"></i> {{ p.telefono }}
+            </a>
+            {% endif %}
           </div>
         </div>
       </div>

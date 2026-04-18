@@ -230,7 +230,7 @@ def delete_cliente(id):
 def get_all_pratiche(cliente_id=None, stato=None, search=None, centro=None, ausilio=None, ordine="data_apertura"):
     conn = get_db()
     query = """
-        SELECT p.*, c.nome, c.cognome, c.codice_fiscale
+        SELECT p.*, c.nome, c.cognome, c.codice_fiscale, c.telefono
         FROM pratiche p JOIN clienti c ON p.cliente_id = c.id
         WHERE 1=1
     """
