@@ -64,8 +64,21 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label fw-semibold">ASL</label>
-            <input type="text" name="ente_pubblico" class="form-control" value="{{ pratica.ente_pubblico or '' }}"
-                   placeholder="es. ASL Roma 2">
+            <select name="ente_pubblico" class="form-select">
+              <option value="">— seleziona —</option>
+              {% for asl in ['ASL Roma 1','ASL Roma 2','ASL Roma 3','ASL Roma 4','ASL Roma 5','ASL Roma 6','FR','LT','VT','RI','Altro'] %}
+              <option value="{{ asl }}" {% if pratica.ente_pubblico == asl %}selected{% endif %}>{{ asl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Centro</label>
+            <select name="centro" class="form-select">
+              <option value="">— seleziona —</option>
+              {% for c in CENTRI %}
+              <option value="{{ c }}" {% if pratica.centro == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Medico prescrittore</label>
@@ -92,8 +105,12 @@
         <div class="row g-3">
           <div class="col-md-5">
             <label class="form-label fw-semibold">Ausilio richiesto</label>
-            <input type="text" name="ausilio_richiesto" class="form-control" value="{{ pratica.ausilio_richiesto or '' }}"
-                   placeholder="es. Carrozzina elettrica, Comunicatore, …">
+            <select name="ausilio_richiesto" class="form-select">
+              <option value="">— seleziona —</option>
+              {% for a in AUSILII %}
+              <option value="{{ a }}" {% if pratica.ausilio_richiesto == a %}selected{% endif %}>{{ a }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="col-md-5">
             <label class="form-label fw-semibold">Descrizione</label>

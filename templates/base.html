@@ -8,75 +8,142 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
     body { background: #f4f6fb; }
+
+    /* ── SIDEBAR DESKTOP ── */
     .sidebar {
       min-height: 100vh;
       background: #1a2540;
-      width: 230px;
+      width: 220px;
       position: fixed;
       top: 0; left: 0;
       padding-top: 1rem;
-      z-index: 100;
+      z-index: 200;
+      overflow-y: auto;
+      transition: transform .25s ease;
     }
     .sidebar .logo {
       color: #fff;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
-      padding: 0.8rem 1.2rem 1.5rem;
+      padding: 0.8rem 1rem 1.2rem;
       border-bottom: 1px solid #2e3d5e;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    .sidebar .logo i { color: #4db8ff; font-size: 1.4rem; }
+    .sidebar .logo i { color: #4db8ff; font-size: 1.3rem; }
     .sidebar .nav-link {
       color: #a0b0cc;
-      padding: 0.65rem 1.2rem;
+      padding: 0.6rem 1rem;
       border-radius: 0.4rem;
-      margin: 0.1rem 0.6rem;
+      margin: 0.1rem 0.5rem;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      font-size: 0.92rem;
+      gap: 0.55rem;
+      font-size: 0.9rem;
       transition: all 0.15s;
     }
     .sidebar .nav-link:hover, .sidebar .nav-link.active {
       background: #2e3d5e;
       color: #fff;
     }
-    .sidebar .nav-link i { font-size: 1.1rem; width: 1.2rem; }
+    .sidebar .nav-link i { font-size: 1.05rem; width: 1.2rem; }
     .sidebar .section-label {
       color: #556080;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      padding: 1.2rem 1.2rem 0.3rem;
+      padding: 1rem 1rem 0.25rem;
       font-weight: 600;
     }
-    .main-content { margin-left: 230px; padding: 2rem; }
-    .page-header {
-      display: flex;
+    .main-content { margin-left: 220px; padding: 1.5rem; }
+
+    /* ── MOBILE NAVBAR ── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #1a2540;
+      z-index: 300;
+      height: 56px;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
+      padding: 0 1rem;
+      gap: 0.75rem;
     }
-    .page-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+    .mobile-nav .logo-text { color:#fff; font-weight:700; font-size:.95rem; flex:1; }
+    .mobile-nav .btn-menu { color:#fff; background:none; border:none; font-size:1.4rem; }
+
+    /* Overlay quando sidebar aperto su mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 190;
+    }
+
+    @media (max-width: 767px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .mobile-nav { display: flex; }
+      .main-content { margin-left: 0; padding: 1rem; padding-top: 70px; }
+    }
+
+    /* ── BOTTOM NAV MOBILE ── */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #1a2540;
+      z-index: 300;
+      height: 58px;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #2e3d5e;
+    }
+    .bottom-nav a {
+      color: #a0b0cc;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: .62rem;
+      gap: 2px;
+    }
+    .bottom-nav a i { font-size: 1.3rem; }
+    .bottom-nav a.active { color: #4db8ff; }
+    @media (max-width: 767px) {
+      .bottom-nav { display: flex; }
+      .main-content { padding-bottom: 70px; }
+    }
+
+    /* ── GENERALI ── */
+    .page-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .page-header h1 { font-size: 1.35rem; font-weight: 700; margin: 0; }
     .card { border: none; box-shadow: 0 1px 6px rgba(0,0,0,.08); border-radius: 0.75rem; }
     .card-header { background: #fff; border-bottom: 1px solid #eef0f5; font-weight: 600; border-radius: 0.75rem 0.75rem 0 0 !important; }
     .stat-card { border-radius: 0.75rem; padding: 1.2rem 1.5rem; color: #fff; }
-    .stat-card .stat-value { font-size: 2rem; font-weight: 700; }
-    .stat-card .stat-label { font-size: 0.85rem; opacity: 0.85; }
-    .badge-stato-aperta { background: #e3f0ff; color: #1a6fc4; }
-    .badge-stato-corso { background: #fff3cd; color: #856404; }
-    .badge-stato-completata { background: #d1e7dd; color: #0a6640; }
-    .badge-stato-chiusa { background: #e2e3e5; color: #444; }
-    .badge-stato-attesa { background: #f8d7da; color: #842029; }
-    table th { font-size: 0.82rem; text-transform: uppercase; color: #6c757d; letter-spacing: 0.04em; }
+    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; }
+    .stat-card .stat-label { font-size: 0.82rem; opacity: 0.85; }
+    table th { font-size: 0.78rem; text-transform: uppercase; color: #6c757d; letter-spacing: 0.04em; }
     .btn-sm { font-size: 0.8rem; }
   </style>
 </head>
 <body>
 
-<nav class="sidebar">
+{# ── MOBILE TOP BAR ── #}
+<div class="mobile-nav">
+  <button class="btn-menu" id="btnMenu"><i class="bi bi-list"></i></button>
+  <span class="logo-text"><i class="bi bi-activity" style="color:#4db8ff;"></i> Gestione Ausili</span>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+{# ── SIDEBAR ── #}
+<nav class="sidebar" id="sidebar">
   <div class="logo"><i class="bi bi-activity"></i> Gestione Ausili</div>
   <div class="section-label">Menu principale</div>
   <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
@@ -89,21 +156,36 @@
     <i class="bi bi-folder2-open"></i> Pratiche
   </a>
   <div class="section-label">Documenti</div>
-  <a href="{{ url_for('templates') }}" class="nav-link {% if request.endpoint == 'templates' or request.endpoint == 'nuovo_template' or request.endpoint == 'modifica_template' %}active{% endif %}">
+  <a href="{{ url_for('templates') }}" class="nav-link {% if request.endpoint in ['templates','nuovo_template','modifica_template'] %}active{% endif %}">
     <i class="bi bi-file-earmark-pdf"></i> Template PDF
   </a>
   <div class="section-label">Drive & Airtable</div>
-  <a href="{{ url_for('drive') }}" class="nav-link {% if request.endpoint == 'drive' or request.endpoint == 'drive_file' %}active{% endif %}">
+  <a href="{{ url_for('drive') }}" class="nav-link {% if request.endpoint in ['drive','drive_file'] %}active{% endif %}">
     <i class="bi bi-folder2-open" style="color:#fbbc04;"></i> Sfoglia Drive
   </a>
   <a href="{{ url_for('importa_airtable_page') }}" class="nav-link {% if 'airtable' in request.endpoint %}active{% endif %}">
     <i class="bi bi-table"></i> Airtable CRM
   </a>
-  <div class="section-label">Sistema</div>
-  <a href="#" class="nav-link text-muted" style="font-size:0.8rem;">
-    <i class="bi bi-info-circle"></i> v1.0
-  </a>
 </nav>
+
+{# ── BOTTOM NAV MOBILE ── #}
+<div class="bottom-nav">
+  <a href="{{ url_for('index') }}"    class="{% if request.endpoint=='index' %}active{% endif %}">
+    <i class="bi bi-speedometer2"></i>Dashboard
+  </a>
+  <a href="{{ url_for('clienti') }}"  class="{% if 'clienti' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-people"></i>Clienti
+  </a>
+  <a href="{{ url_for('pratiche') }}" class="{% if 'pratich' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-folder2-open"></i>Pratiche
+  </a>
+  <a href="{{ url_for('templates') }}" class="{% if 'template' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-file-earmark-pdf"></i>PDF
+  </a>
+  <a href="{{ url_for('drive') }}"    class="{% if 'drive' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-google"></i>Drive
+  </a>
+</div>
 
 <div class="main-content">
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -119,6 +201,21 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const btnMenu = document.getElementById('btnMenu');
+  function toggleSidebar() {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  }
+  btnMenu.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+  // Chiudi sidebar quando si clicca un link (mobile)
+  sidebar.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
+    if (window.innerWidth < 768) toggleSidebar();
+  }));
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

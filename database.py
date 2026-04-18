@@ -156,22 +156,26 @@ def init_db():
     _add_column_if_missing(conn, "pratiche", "data_ordine",       "TEXT")
     _add_column_if_missing(conn, "clienti",  "centro",            "TEXT")
     _add_column_if_missing(conn, "clienti",  "anno_residenza",    "TEXT")
+    _add_column_if_missing(conn, "pratiche", "centro",            "TEXT")
 
     conn.close()
 
 
 # ── CLIENTI ──────────────────────────────────────────────────────────────────
 
-def get_all_clienti(search=None):
+def get_all_clienti(search=None, ordine="cognome"):
+    ordini_validi = {"cognome", "nome", "asl_competente", "citta", "centro", "data_inserimento"}
+    if ordine not in ordini_validi:
+        ordine = "cognome"
     conn = get_db()
     if search:
         q = f"%{search}%"
         rows = conn.execute(
-            "SELECT * FROM clienti WHERE attivo=1 AND (nome LIKE ? OR cognome LIKE ? OR codice_fiscale LIKE ? OR citta LIKE ?) ORDER BY cognome, nome",
+            f"SELECT * FROM clienti WHERE attivo=1 AND (nome LIKE ? OR cognome LIKE ? OR codice_fiscale LIKE ? OR citta LIKE ?) ORDER BY {ordine}, cognome",
             (q, q, q, q)
         ).fetchall()
     else:
-        rows = conn.execute("SELECT * FROM clienti WHERE attivo=1 ORDER BY cognome, nome").fetchall()
+        rows = conn.execute(f"SELECT * FROM clienti WHERE attivo=1 ORDER BY {ordine}, cognome").fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -223,7 +227,7 @@ def delete_cliente(id):
 
 # ── PRATICHE ─────────────────────────────────────────────────────────────────
 
-def get_all_pratiche(cliente_id=None, stato=None, search=None):
+def get_all_pratiche(cliente_id=None, stato=None, search=None, centro=None, ausilio=None, ordine="data_apertura"):
     conn = get_db()
     query = """
         SELECT p.*, c.nome, c.cognome, c.codice_fiscale
@@ -235,11 +239,19 @@ def get_all_pratiche(cliente_id=None, stato=None, search=None):
         query += " AND p.cliente_id=?"; params.append(cliente_id)
     if stato:
         query += " AND p.stato=?"; params.append(stato)
+    if centro:
+        query += " AND p.centro=?"; params.append(centro)
+    if ausilio:
+        query += " AND p.ausilio_richiesto=?"; params.append(ausilio)
     if search:
         q = f"%{search}%"
         query += " AND (p.numero_pratica LIKE ? OR c.cognome LIKE ? OR p.ausilio_richiesto LIKE ?)"
         params += [q, q, q]
-    query += " ORDER BY p.data_apertura DESC"
+    # Ordinamento sicuro
+    ordini_validi = {"data_apertura", "stato", "centro", "ausilio_richiesto", "c.cognome"}
+    if ordine not in ordini_validi:
+        ordine = "data_apertura"
+    query += f" ORDER BY {ordine} DESC"
     rows = conn.execute(query, params).fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -258,7 +270,7 @@ def get_pratica(id):
 def save_pratica(data, id=None):
     conn = get_db()
     fields = ["cliente_id","stato","data_apertura","data_chiusura",
-              "ente_pubblico","medico_prescrittore","ausilio_richiesto",
+              "ente_pubblico","centro","medico_prescrittore","ausilio_richiesto",
               "descrizione_ausilio","importo_preventivo","importo_liquidato",
               "data_autorizzazione","data_fornitura",
               "data_segnalazione","data_valutazione","data_prescrizione","data_ordine",

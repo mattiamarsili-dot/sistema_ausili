@@ -12,6 +12,18 @@ app.secret_key = "ausili_secret_2024"
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "data", "pdf_templates")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+CENTRI_LIST = [
+    "ASL","CPA","CTO","Campus","Capo Darco","Gemelli","HBG",
+    "Nemo","PTV","PUPrimo","Sabelli","Santa Lucia","Sant'Andrea","VillaFulvia","Wildm"
+]
+
+AUSILII_LIST = [
+    "Accessori","B. esterni","Bascula su Misura","Basculante Posturale","Bici",
+    "Deambulatore","Elettronica","Leggera","Materasso","Montascale","Moveon",
+    "Passeggino posturale","Postura Pediatrica","Postura Tronco","Propulsore",
+    "Sectional Body","Sedia WX","Statica","Super leggera"
+]
+
 
 # ── INIT ─────────────────────────────────────────────────────────────────────
 
@@ -33,8 +45,11 @@ def index():
 @app.route("/clienti")
 def clienti():
     search = request.args.get("q", "")
-    lista = db.get_all_clienti(search=search or None)
-    return render_template("clienti.html", clienti=lista, search=search)
+    vista  = request.args.get("vista", "tabella")  # tabella | card
+    ordine = request.args.get("ordine", "cognome")
+    lista  = db.get_all_clienti(search=search or None, ordine=ordine)
+    return render_template("clienti.html", clienti=lista, search=search,
+                           vista=vista, ordine=ordine)
 
 
 @app.route("/clienti/nuovo", methods=["GET", "POST"])
@@ -71,10 +86,21 @@ def elimina_cliente(id):
 
 @app.route("/pratiche")
 def pratiche():
-    search = request.args.get("q", "")
-    stato = request.args.get("stato", "")
-    lista = db.get_all_pratiche(stato=stato or None, search=search or None)
-    return render_template("pratiche.html", pratiche=lista, search=search, stato_filtro=stato)
+    search  = request.args.get("q", "")
+    stato   = request.args.get("stato", "")
+    centro  = request.args.get("centro", "")
+    ausilio = request.args.get("ausilio", "")
+    ordine  = request.args.get("ordine", "data_apertura")
+    vista   = request.args.get("vista", "tabella")   # tabella | card
+    lista = db.get_all_pratiche(
+        stato=stato or None, search=search or None,
+        centro=centro or None, ausilio=ausilio or None, ordine=ordine
+    )
+    return render_template("pratiche.html", pratiche=lista,
+                           search=search, stato_filtro=stato,
+                           centro_filtro=centro, ausilio_filtro=ausilio,
+                           ordine=ordine, vista=vista,
+                           CENTRI=CENTRI_LIST, AUSILII=AUSILII_LIST)
 
 
 @app.route("/pratiche/nuova", methods=["GET", "POST"])
@@ -86,7 +112,8 @@ def nuova_pratica():
     clienti_list = db.get_all_clienti()
     cliente_id = request.args.get("cliente_id")
     return render_template("pratica_form.html", pratica={}, clienti=clienti_list,
-                           selected_cliente=cliente_id, title="Nuova Pratica")
+                           selected_cliente=cliente_id, title="Nuova Pratica",
+                           CENTRI=CENTRI_LIST, AUSILII=AUSILII_LIST)
 
 
 @app.route("/pratiche/<int:id>", methods=["GET", "POST"])
@@ -108,7 +135,8 @@ def modifica_pratica(id):
     if not pratica.get("medico_prescrittore") and cliente:
         pratica["medico_prescrittore"] = cliente.get("medico_referente", "")
     return render_template("pratica_form.html", pratica=pratica, clienti=clienti_list,
-                           templates=templates, asl_cliente=asl, title="Dettaglio Pratica")
+                           templates=templates, asl_cliente=asl, title="Dettaglio Pratica",
+                           CENTRI=CENTRI_LIST, AUSILII=AUSILII_LIST)
 
 
 # ── PDF TEMPLATES ─────────────────────────────────────────────────────────────

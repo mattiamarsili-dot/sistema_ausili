@@ -1,25 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Clienti - Gestione Ausili{% endblock %}
-{% block content %}
+{% block title %}Clienti – Gestione Ausili{% endblock %}
 
+{% block content %}
 <div class="page-header">
   <h1><i class="bi bi-people me-2 text-primary"></i>Clienti</h1>
   <a href="{{ url_for('nuovo_cliente') }}" class="btn btn-primary">
-    <i class="bi bi-person-plus me-1"></i> Nuovo cliente
+    <i class="bi bi-person-plus me-1"></i><span class="d-none d-sm-inline">Nuovo cliente</span>
   </a>
 </div>
 
+{# ── Barra filtri ── #}
 <div class="card mb-3">
-  <div class="card-body py-2">
-    <form method="get" class="d-flex gap-2">
-      <input type="text" name="q" value="{{ search }}" class="form-control" placeholder="Cerca per nome, cognome, codice fiscale, città…">
-      <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
-      {% if search %}<a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">Azzera</a>{% endif %}
+  <div class="card-body py-2 px-3">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-12 col-md-5">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" value="{{ search }}" class="form-control" placeholder="Nome, cognome, CF, città…">
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <select name="ordine" class="form-select form-select-sm">
+          <option value="cognome"          {% if ordine=='cognome' %}selected{% endif %}>Ordina: Cognome</option>
+          <option value="asl_competente"   {% if ordine=='asl_competente' %}selected{% endif %}>Ordina: ASL</option>
+          <option value="centro"           {% if ordine=='centro' %}selected{% endif %}>Ordina: Centro</option>
+          <option value="citta"            {% if ordine=='citta' %}selected{% endif %}>Ordina: Città</option>
+          <option value="data_inserimento" {% if ordine=='data_inserimento' %}selected{% endif %}>Ordina: Recenti</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <div class="btn-group btn-group-sm w-100">
+          <a href="?q={{ search }}&ordine={{ ordine }}&vista=tabella"
+             class="btn {% if vista=='tabella' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            <i class="bi bi-list-ul"></i>
+          </a>
+          <a href="?q={{ search }}&ordine={{ ordine }}&vista=card"
+             class="btn {% if vista=='card' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+            <i class="bi bi-grid-3x3-gap"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-12 col-md-2 d-flex gap-1">
+        <button class="btn btn-sm btn-outline-primary flex-grow-1">Cerca</button>
+        {% if search %}<a href="{{ url_for('clienti') }}" class="btn btn-sm btn-outline-secondary">✕</a>{% endif %}
+      </div>
     </form>
   </div>
 </div>
 
-<div class="card">
+{% if clienti %}
+<div class="text-muted small mb-2 px-1">{{ clienti|length }} cliente/i</div>
+{% endif %}
+
+{# ════════════════ VISTA TABELLA ════════════════ #}
+{% if vista == 'tabella' %}
+<div class="card d-none d-md-block">
   <div class="card-body p-0">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
@@ -29,50 +64,72 @@
           <th>Città</th>
           <th>Telefono</th>
           <th>ASL</th>
-          <th>Disabilità</th>
+          <th>Centro</th>
           <th class="text-end">Azioni</th>
         </tr>
       </thead>
       <tbody>
       {% for c in clienti %}
-      <tr>
-        <td>
-          <a href="{{ url_for('modifica_cliente', id=c.id) }}" class="text-decoration-none fw-semibold">
-            {{ c.cognome }} {{ c.nome }}
-          </a>
-        </td>
+      <tr style="cursor:pointer;" onclick="location.href='{{ url_for('modifica_cliente', id=c.id) }}'">
+        <td class="fw-semibold">{{ c.cognome }} {{ c.nome }}</td>
         <td class="font-monospace small">{{ c.codice_fiscale or '—' }}</td>
         <td>{{ c.citta or '—' }}{% if c.provincia %} ({{ c.provincia }}){% endif %}</td>
         <td>{{ c.telefono or '—' }}</td>
         <td class="small">{{ c.asl_competente or '—' }}</td>
-        <td class="small">{{ c.tipo_disabilita or '—' }}</td>
-        <td class="text-end">
-          <a href="{{ url_for('modifica_cliente', id=c.id) }}" class="btn btn-sm btn-outline-primary" title="Modifica">
-            <i class="bi bi-pencil"></i>
-          </a>
-          <a href="{{ url_for('nuova_pratica') }}?cliente_id={{ c.id }}" class="btn btn-sm btn-outline-warning" title="Nuova pratica">
-            <i class="bi bi-folder-plus"></i>
-          </a>
-          <form method="post" action="{{ url_for('elimina_cliente', id=c.id) }}" class="d-inline"
-                onsubmit="return confirm('Rimuovere {{ c.cognome }} {{ c.nome }}?')">
-            <button class="btn btn-sm btn-outline-danger" title="Rimuovi"><i class="bi bi-trash"></i></button>
-          </form>
+        <td class="small">{{ c.centro or '—' }}</td>
+        <td class="text-end" onclick="event.stopPropagation()">
+          <a href="{{ url_for('modifica_cliente', id=c.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+          <a href="{{ url_for('nuova_pratica') }}?cliente_id={{ c.id }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-folder-plus"></i></a>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="7" class="text-center text-muted py-4">
-        Nessun cliente trovato.
-        <a href="{{ url_for('nuovo_cliente') }}">Aggiungi il primo cliente</a>
-      </td></tr>
+      <tr><td colspan="7" class="text-center text-muted py-4">Nessun cliente trovato.</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
-  {% if clienti %}
-  <div class="card-footer bg-white text-muted small">
-    {{ clienti | length }} cliente/i trovati
-  </div>
-  {% endif %}
 </div>
+{% endif %}
 
+{# ════════════════ VISTA CARD (anche mobile automatico) ════════════════ #}
+{% if vista == 'card' or vista == 'tabella' %}
+<div class="row g-2 {% if vista == 'tabella' %}d-md-none{% endif %}">
+  {% for c in clienti %}
+  <div class="col-12 col-sm-6 col-xl-4">
+    <a href="{{ url_for('modifica_cliente', id=c.id) }}" class="text-decoration-none">
+      <div class="card h-100 card-cliente">
+        <div class="card-body py-3 px-3">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <div class="fw-bold text-dark" style="font-size:1rem;">{{ c.cognome }} {{ c.nome }}</div>
+            {% if c.asl_competente %}
+            <span class="badge bg-primary-subtle text-primary ms-2" style="font-size:.7rem;white-space:nowrap;">{{ c.asl_competente }}</span>
+            {% endif %}
+          </div>
+          <div class="text-muted small mb-1">
+            {% if c.codice_fiscale %}<span class="font-monospace">{{ c.codice_fiscale }}</span>{% endif %}
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-2" style="font-size:.82rem;">
+            {% if c.citta %}<span><i class="bi bi-geo-alt text-secondary"></i> {{ c.citta }}{% if c.provincia %} ({{ c.provincia }}){% endif %}</span>{% endif %}
+            {% if c.telefono %}<span><i class="bi bi-telephone text-secondary"></i> {{ c.telefono }}</span>{% endif %}
+            {% if c.centro %}<span><i class="bi bi-hospital text-secondary"></i> {{ c.centro }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-5">
+    Nessun cliente trovato. <a href="{{ url_for('nuovo_cliente') }}">Aggiungi il primo</a>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+.card-cliente { border: 1px solid #e8eaf0; transition: box-shadow .15s, transform .1s; }
+.card-cliente:hover { box-shadow: 0 4px 18px rgba(0,0,0,.10); transform: translateY(-1px); }
+</style>
 {% endblock %}
