@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Gestione Chiavi Dati{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-key me-2 text-warning"></i>Chiavi Dati & Suggerimenti</h1>
+  <a href="{{ url_for('templates') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i> Torna ai template
+  </a>
+</div>
+
+<div class="row g-3">
+
+  {# ── COLONNA SX: Chiavi custom ── #}
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-plus-circle me-2 text-success"></i>Chiavi calcolate / personalizzate</span>
+        <span class="badge bg-secondary">{{ chiavi_custom|length }}</span>
+      </div>
+      <div class="card-body p-3">
+        <p class="text-muted small mb-3">
+          Aggiungi chiavi che non esistono come colonna nel database ma sono calcolate dal sistema
+          (es. <code>nome_azienda</code>, <code>data_oggi</code>, <code>pratica.codice_am</code>).
+        </p>
+
+        {# Form aggiunta #}
+        <form method="post" class="row g-2 mb-3">
+          <input type="hidden" name="azione" value="aggiungi_chiave">
+          <div class="col-5">
+            <input type="text" name="chiave" class="form-control form-control-sm"
+                   placeholder="chiave.dato" required>
+            <div class="form-text" style="font-size:.68rem;">es. cliente.cognome_nome</div>
+          </div>
+          <div class="col-5">
+            <input type="text" name="label" class="form-control form-control-sm"
+                   placeholder="Descrizione leggibile" required>
+            <div class="form-text" style="font-size:.68rem;">es. Cognome + Nome</div>
+          </div>
+          <div class="col-2">
+            <button class="btn btn-success btn-sm w-100">+</button>
+          </div>
+        </form>
+
+        {# Lista chiavi custom #}
+        {% if chiavi_custom %}
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Chiave</th><th>Descrizione</th><th></th></tr>
+          </thead>
+          <tbody>
+          {% for c in chiavi_custom %}
+          <tr>
+            <td><code style="font-size:.75rem;">{{ c.chiave }}</code></td>
+            <td class="small text-muted">{{ c.label }}</td>
+            <td class="text-end">
+              <form method="post" class="d-inline">
+                <input type="hidden" name="azione" value="rimuovi_chiave">
+                <input type="hidden" name="chiave" value="{{ c.chiave }}">
+                <button class="btn btn-sm btn-outline-danger py-0 px-1"
+                        onclick="return confirm('Rimuovere?')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted small">Nessuna chiave custom aggiunta.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Chiavi DB (sola lettura) ── #}
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-database me-2 text-primary"></i>Campi dal database
+        <span class="badge bg-secondary ms-1">{{ chiavi_db|length }}</span>
+        <span class="text-muted small ms-2">(generati automaticamente)</span>
+      </div>
+      <div class="card-body p-0">
+        <div style="max-height:350px; overflow-y:auto;">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light sticky-top">
+              <tr><th>Chiave</th><th>Campo DB</th></tr>
+            </thead>
+            <tbody>
+            {% for c in chiavi_db %}
+            <tr>
+              <td><code style="font-size:.72rem;">{{ c.chiave }}</code></td>
+              <td class="small text-muted">{{ c.label }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── COLONNA DX: Suggerimenti automatici ── #}
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-magic me-2 text-warning"></i>Suggerimenti automatici</span>
+        <span class="badge bg-secondary">{{ suggerimenti|length }}</span>
+      </div>
+      <div class="card-body p-3">
+        <p class="text-muted small mb-3">
+          Quando un campo PDF contiene una certa <strong>parola chiave</strong> nel nome,
+          viene suggerita automaticamente la chiave dati corrispondente.
+          La parola viene cercata con <em>contains</em> (case-insensitive).
+        </p>
+
+        {# Form aggiunta #}
+        <form method="post" class="row g-2 mb-3">
+          <input type="hidden" name="azione" value="aggiungi_suggerimento">
+          <div class="col-4">
+            <input type="text" name="parola" class="form-control form-control-sm"
+                   placeholder="parola chiave" required>
+            <div class="form-text" style="font-size:.68rem;">es. delegat, tutore, anno</div>
+          </div>
+          <div class="col-6">
+            <input type="text" name="valore" class="form-control form-control-sm"
+                   placeholder="chiave dati risultante" required>
+            <div class="form-text" style="font-size:.68rem;">es. nome_azienda</div>
+          </div>
+          <div class="col-2">
+            <button class="btn btn-success btn-sm w-100">+</button>
+          </div>
+        </form>
+
+        {# Lista suggerimenti #}
+        {% if suggerimenti %}
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Parola nel campo PDF</th><th>Chiave suggerita</th><th></th></tr>
+          </thead>
+          <tbody>
+          {% for parola, valore in suggerimenti.items() %}
+          {% if not parola.startswith('_') %}
+          <tr>
+            <td><span class="badge bg-warning text-dark">{{ parola }}</span></td>
+            <td><code style="font-size:.75rem;">{{ valore }}</code></td>
+            <td class="text-end">
+              <form method="post" class="d-inline">
+                <input type="hidden" name="azione" value="rimuovi_suggerimento">
+                <input type="hidden" name="parola" value="{{ parola }}">
+                <button class="btn btn-sm btn-outline-danger py-0 px-1"
+                        onclick="return confirm('Rimuovere?')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted small">Nessun suggerimento configurato.</p>
+        {% endif %}
+
+        <div class="alert alert-light border mt-3 p-2" style="font-size:.78rem;">
+          <strong>Come funziona:</strong><br>
+          Se il campo PDF si chiama <code>Text_delegato_firma</code> e hai il suggerimento
+          <code>delegat → nome_azienda</code>, nella colonna "Suggerimento" apparirà automaticamente
+          <code>nome_azienda</code>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

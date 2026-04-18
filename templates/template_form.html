@@ -150,7 +150,18 @@
               <td><code style="font-size:.7rem;">{{ campo.nome_campo }}</code></td>
               <td class="text-muted" style="font-size:.7rem;">
                 {% set n = campo.nome_campo | lower %}
-                {% if 'nome' in n and 'cog' not in n %}cliente.nome
+                {% set trovato = namespace(val='') %}
+                {# Prima controlla suggerimenti custom dal file #}
+                {% if suggerimenti %}
+                  {% for parola, valore in suggerimenti.items() %}
+                    {% if not parola.startswith('_') and parola in n %}
+                      {% set trovato.val = valore %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+                {# Poi fallback sulle regole base #}
+                {% if trovato.val %}{{ trovato.val }}
+                {% elif 'nome' in n and 'cog' not in n %}cliente.nome
                 {% elif 'cognome' in n %}cliente.cognome
                 {% elif 'fiscal' in n or 'cf' in n %}cliente.codice_fiscale
                 {% elif 'nasc' in n and 'data' not in n %}cliente.luogo_nascita
@@ -164,7 +175,6 @@
                 {% elif 'medico' in n %}pratica.medico_prescrittore
                 {% elif 'ausil' in n %}pratica.ausilio_richiesto
                 {% elif 'data' in n %}data_oggi
-                {% elif 'delegat' in n %}nome_azienda
                 {% else %}—{% endif %}
               </td>
             </tr>
@@ -189,39 +199,40 @@
 
         {# ── Chiavi dati disponibili ── #}
         <div class="mt-3">
-          <div class="fw-semibold small mb-1">Chiavi dati disponibili <span class="text-muted">(clicca per copiare)</span></div>
-          <div style="max-height:280px; overflow-y:auto;">
-            {% set chiavi = [
-              ('cliente.cognome_nome','Cognome + Nome'),
-              ('cliente.nome','Nome'), ('cliente.cognome','Cognome'),
-              ('cliente.codice_fiscale','Cod. fiscale'),
-              ('cliente.data_nascita','Data nascita'), ('cliente.luogo_nascita','Luogo nascita'),
-              ('cliente.indirizzo','Indirizzo'), ('cliente.cap','CAP'),
-              ('cliente.citta','Città'), ('cliente.provincia','Provincia'),
-              ('cliente.anno_residenza','Residente dal'),
-              ('cliente.telefono','Telefono'), ('cliente.email','Email'),
-              ('cliente.asl_competente','ASL'), ('cliente.medico_referente','Medico ref.'),
-              ('cliente.tipo_disabilita','Patologia'),
-              ('cliente.doc_tipo_numero','Doc. tipo + numero'),
-              ('cliente.tutore_cognome_nome','Tutore nome'),
-              ('cliente.tutore_doc_tipo_numero','Tutore doc.'),
-              ('pratica.medico_prescrittore','Medico prescrittore'),
-              ('pratica.ausilio_richiesto','Ausilio'),
-              ('pratica.ente_pubblico','ASL pratica'),
-              ('pratica.centro','Centro'),
-              ('pratica.data_autorizzazione','Data autorizzazione'),
-              ('pratica.data_apertura','Data apertura'),
-              ('pratica.importo_preventivo','Importo prev.'),
-              ('pratica.codice_am','Codice AM'),
-              ('asl_competente','ASL (top-level)'),
-              ('nome_azienda','SAPIO LIFE SRL'),
-              ('data_oggi','Data odierna'),
-            ] %}
-            {% for chiave, label in chiavi %}
+          <div class="fw-semibold small mb-1 d-flex justify-content-between align-items-center">
+            <span>Chiavi dati <span class="text-muted">(clicca per copiare)</span></span>
+            <a href="{{ url_for('gestisci_chiavi') }}" class="btn btn-outline-warning btn-sm py-0 px-2"
+               style="font-size:.7rem;" target="_blank">
+              <i class="bi bi-plus-circle me-1"></i>Aggiungi chiave
+            </a>
+          </div>
+
+          {# Chiavi custom #}
+          {% if chiavi_custom %}
+          <div class="text-muted mb-1" style="font-size:.67rem; text-transform:uppercase; letter-spacing:.05em;">
+            Personalizzate
+          </div>
+          {% for c in chiavi_custom %}
+          <div class="d-flex align-items-center gap-1 mb-1"
+               style="cursor:pointer;" onclick="copiaChiave('{{ c.chiave }}', this)">
+            <code class="flex-grow-1 rounded px-2 py-1" style="font-size:.68rem; background:#fff8e1;">
+              <span class="text-muted">{{ c.label }}:</span> {{ c.chiave }}
+            </code>
+            <i class="bi bi-clipboard text-muted" style="font-size:.8rem;"></i>
+          </div>
+          {% endfor %}
+          {% endif %}
+
+          {# Chiavi dal DB #}
+          <div class="text-muted mt-2 mb-1" style="font-size:.67rem; text-transform:uppercase; letter-spacing:.05em;">
+            Dal database
+          </div>
+          <div style="max-height:220px; overflow-y:auto;">
+            {% for c in chiavi_db %}
             <div class="d-flex align-items-center gap-1 mb-1"
-                 style="cursor:pointer;" onclick="copiaChiave('{{ chiave }}', this)">
+                 style="cursor:pointer;" onclick="copiaChiave('{{ c.chiave }}', this)">
               <code class="flex-grow-1 bg-light rounded px-2 py-1" style="font-size:.68rem;">
-                <span class="text-muted">{{ label }}:</span> {{ chiave }}
+                <span class="text-muted">{{ c.label }}:</span> {{ c.chiave }}
               </code>
               <i class="bi bi-clipboard text-muted" style="font-size:.8rem;"></i>
             </div>

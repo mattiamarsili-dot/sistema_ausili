@@ -1,0 +1,44 @@
+{
+  "_note": "Aggiungi qui chiavi calcolate o alias personalizzati. label=nome leggibile, chiave=codice usato nel JSON mappatura.",
+  "chiavi": [
+    {
+      "chiave": "nome_azienda",
+      "label": "Nome azienda (SAPIO LIFE SRL)"
+    },
+    {
+      "chiave": "asl_competente",
+      "label": "ASL (top-level)"
+    },
+    {
+      "chiave": "data_oggi",
+      "label": "Data odierna"
+    },
+    {
+      "chiave": "cliente.cognome_nome",
+      "label": "Cognome + Nome cliente"
+    },
+    {
+      "chiave": "cliente.doc_tipo_numero",
+      "label": "Documento tipo + numero"
+    },
+    {
+      "chiave": "cliente.tutore_doc_tipo_numero",
+      "label": "Tutore documento tipo + numero"
+    },
+    {
+      "chiave": "pratica.codice_am",
+      "label": "Codice AM (AM+ddmm.aa)"
+    }
+  ],
+  "suggerimenti": {
+    "_note": "Parole chiave nel nome campo PDF → chiave dati suggerita automaticamente",
+    "delegat": "nome_azienda",
+    "azienda": "nome_azienda",
+    "sapio": "nome_azienda",
+    "anno": "cliente.anno_residenza",
+    "tutore": "cliente.tutore_cognome_nome",
+    "am": "pratica.codice_am",
+    "centro": "pratica.centro",
+    "data prescrizione": "pratica.data_prescrizione"
+  }
+}

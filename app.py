@@ -178,7 +178,11 @@ def modifica_template(id):
         flash("Template aggiornato.", "success")
         return redirect(url_for("templates"))
     campi = pdf_mod.inspect_pdf(tmpl["file_path"])
-    return render_template("template_form.html", template=tmpl, campi=campi, title="Configura Template")
+    chiavi_db, chiavi_custom, suggerimenti = _carica_chiavi()
+    return render_template("template_form.html", template=tmpl, campi=campi,
+                           chiavi_db=chiavi_db, chiavi_custom=chiavi_custom,
+                           suggerimenti=suggerimenti,
+                           title="Configura Template")
 
 
 @app.route("/templates/<int:id>/preview")
@@ -188,6 +192,95 @@ def template_preview(id):
     if not tmpl or not os.path.isfile(tmpl["file_path"]):
         return "File non trovato", 404
     return send_file(tmpl["file_path"], mimetype="application/pdf")
+
+
+def _carica_chiavi():
+    """Restituisce lista chiavi DB + custom per la UI di configurazione template."""
+    CHIAVI_PATH = os.path.join(os.path.dirname(__file__), "config", "chiavi_custom.json")
+
+    # Chiavi dal DB (generate automaticamente dalle colonne)
+    chiavi_db = []
+    try:
+        conn = db.get_db()
+        cols_c = [r[1] for r in conn.execute("PRAGMA table_info(clienti)").fetchall()]
+        cols_p = [r[1] for r in conn.execute("PRAGMA table_info(pratiche)").fetchall()]
+        conn.close()
+        skip = {"id","attivo","data_inserimento","cliente_id"}
+        for col in cols_c:
+            if col not in skip:
+                chiavi_db.append({"chiave": f"cliente.{col}", "label": col.replace("_"," ").title(), "fonte": "db"})
+        for col in cols_p:
+            if col not in skip:
+                chiavi_db.append({"chiave": f"pratica.{col}", "label": col.replace("_"," ").title(), "fonte": "db"})
+    except Exception:
+        pass
+
+    # Chiavi custom dal file
+    chiavi_custom = []
+    suggerimenti = {}
+    if os.path.isfile(CHIAVI_PATH):
+        try:
+            with open(CHIAVI_PATH) as f:
+                dati = json.load(f)
+            chiavi_custom = dati.get("chiavi", [])
+            suggerimenti = dati.get("suggerimenti", {})
+            # aggiungi fonte
+            for c in chiavi_custom:
+                c["fonte"] = "custom"
+        except Exception:
+            pass
+
+    return chiavi_db, chiavi_custom, suggerimenti
+
+
+@app.route("/templates/chiavi", methods=["GET", "POST"])
+def gestisci_chiavi():
+    """Pagina per aggiungere/rimuovere chiavi custom e suggerimenti."""
+    CHIAVI_PATH = os.path.join(os.path.dirname(__file__), "config", "chiavi_custom.json")
+
+    if request.method == "POST":
+        azione = request.form.get("azione")
+        with open(CHIAVI_PATH) as f:
+            dati = json.load(f)
+
+        if azione == "aggiungi_chiave":
+            nuova = {"chiave": request.form.get("chiave","").strip(),
+                     "label": request.form.get("label","").strip()}
+            if nuova["chiave"]:
+                # evita duplicati
+                if not any(c["chiave"] == nuova["chiave"] for c in dati["chiavi"]):
+                    dati["chiavi"].append(nuova)
+                    flash(f"Chiave '{nuova['chiave']}' aggiunta.", "success")
+                else:
+                    flash("Chiave già presente.", "warning")
+
+        elif azione == "rimuovi_chiave":
+            chiave = request.form.get("chiave","")
+            dati["chiavi"] = [c for c in dati["chiavi"] if c["chiave"] != chiave]
+            flash(f"Chiave '{chiave}' rimossa.", "success")
+
+        elif azione == "aggiungi_suggerimento":
+            parola = request.form.get("parola","").strip().lower()
+            valore = request.form.get("valore","").strip()
+            if parola and valore:
+                dati["suggerimenti"][parola] = valore
+                flash(f"Suggerimento '{parola}' → '{valore}' aggiunto.", "success")
+
+        elif azione == "rimuovi_suggerimento":
+            parola = request.form.get("parola","")
+            dati["suggerimenti"].pop(parola, None)
+            flash(f"Suggerimento '{parola}' rimosso.", "success")
+
+        with open(CHIAVI_PATH, "w") as f:
+            json.dump(dati, f, ensure_ascii=False, indent=2)
+
+        return redirect(url_for("gestisci_chiavi"))
+
+    chiavi_db, chiavi_custom, suggerimenti = _carica_chiavi()
+    return render_template("chiavi.html",
+                           chiavi_db=chiavi_db,
+                           chiavi_custom=chiavi_custom,
+                           suggerimenti=suggerimenti)
 
 
 # ── COMPILAZIONE PDF ─────────────────────────────────────────────────────────
