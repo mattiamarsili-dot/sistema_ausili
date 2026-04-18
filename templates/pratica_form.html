@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-folder2-open me-2 text-warning"></i>{{ title }}</h1>
+  <a href="{{ url_for('pratiche') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Torna alle pratiche
+  </a>
+</div>
+
+{% if pratica.numero_pratica %}
+<div class="alert alert-light border d-flex align-items-center gap-3 mb-3">
+  <span class="fs-5 fw-bold font-monospace">{{ pratica.numero_pratica }}</span>
+  {% set badge_map = {'Aperta':'primary','In corso':'warning','Completata':'success','Chiusa':'secondary','In attesa':'danger'} %}
+  <span class="badge bg-{{ badge_map.get(pratica.stato, 'secondary') }} fs-6">{{ pratica.stato }}</span>
+  <span class="text-muted small ms-auto">Aperta il {{ pratica.data_apertura or '—' }}</span>
+</div>
+{% endif %}
+
+<form method="post">
+<div class="row g-3">
+
+  <!-- Cliente e stato -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-person-check me-2"></i>Cliente</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-7">
+            <label class="form-label fw-semibold">Cliente *</label>
+            <select name="cliente_id" id="select-cliente" class="form-select" required onchange="caricaDatiCliente(this.value)">
+              <option value="">— Seleziona cliente —</option>
+              {% for c in clienti %}
+              <option value="{{ c.id }}"
+                {% if pratica.cliente_id == c.id or request.args.get('cliente_id')|int == c.id %}selected{% endif %}>
+                {{ c.cognome }} {{ c.nome }} {% if c.codice_fiscale %}({{ c.codice_fiscale }}){% endif %}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Stato</label>
+            <select name="stato" class="form-select">
+              {% for s in ['Aperta','In corso','In attesa','Completata','Chiusa'] %}
+              <option value="{{ s }}" {% if pratica.stato == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Data apertura</label>
+            <input type="date" name="data_apertura" class="form-control" value="{{ pratica.data_apertura or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASL e medico -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-building me-2"></i>ASL e prescrizione</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">ASL</label>
+            <input type="text" name="ente_pubblico" class="form-control" value="{{ pratica.ente_pubblico or '' }}"
+                   placeholder="es. ASL Roma 2">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Medico prescrittore</label>
+            <div class="input-group">
+              <input type="text" name="medico_prescrittore" id="input-medico" class="form-control"
+                     value="{{ pratica.medico_prescrittore or '' }}"
+                     placeholder="Dal cliente o modifica manualmente">
+              <button type="button" class="btn btn-outline-secondary" title="Riprendi dal cliente"
+                      onclick="caricaDatiCliente(document.getElementById('select-cliente').value, true)">
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ausilio -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-wheelchair me-2"></i>Ausilio</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Ausilio richiesto</label>
+            <input type="text" name="ausilio_richiesto" class="form-control" value="{{ pratica.ausilio_richiesto or '' }}"
+                   placeholder="es. Carrozzina elettrica, Comunicatore, …">
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Descrizione</label>
+            <input type="text" name="descrizione_ausilio" class="form-control" value="{{ pratica.descrizione_ausilio or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Importo preventivo (€)</label>
+            <input type="number" step="0.01" name="importo_preventivo" class="form-control"
+                   value="{{ pratica.importo_preventivo or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Costo Ausili (€)</label>
+            <input type="number" step="0.01" name="importo_liquidato" class="form-control"
+                   value="{{ pratica.importo_liquidato or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline avanzamento pratica -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history text-primary"></i>
+        <span class="fw-semibold">Avanzamento pratica</span>
+        <span class="text-muted small ms-2">— date di ogni fase</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 text-center">
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#6c757d!important">
+              <div class="small fw-semibold text-muted mb-1">
+                <i class="bi bi-flag me-1"></i>Segnalazione
+              </div>
+              <input type="date" name="data_segnalazione" class="form-control form-control-sm"
+                     value="{{ pratica.data_segnalazione or '' }}">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#0d6efd!important">
+              <div class="small fw-semibold text-primary mb-1">
+                <i class="bi bi-search me-1"></i>Valutazione
+              </div>
+              <input type="date" name="data_valutazione" class="form-control form-control-sm"
+                     value="{{ pratica.data_valutazione or '' }}">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#6610f2!important">
+              <div class="small fw-semibold mb-1" style="color:#6610f2">
+                <i class="bi bi-file-medical me-1"></i>Prescrizione
+              </div>
+              <input type="date" name="data_prescrizione" class="form-control form-control-sm"
+                     value="{{ pratica.data_prescrizione or '' }}">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#dc3545!important">
+              <div class="small fw-semibold text-danger mb-1">
+                <i class="bi bi-building me-1"></i>ASL
+              </div>
+              <input type="date" name="data_autorizzazione" class="form-control form-control-sm"
+                     value="{{ pratica.data_autorizzazione or '' }}">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#fd7e14!important">
+              <div class="small fw-semibold mb-1" style="color:#fd7e14">
+                <i class="bi bi-cart-check me-1"></i>Ordine
+              </div>
+              <input type="date" name="data_ordine" class="form-control form-control-sm"
+                     value="{{ pratica.data_ordine or '' }}">
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="border rounded p-2 h-100" style="border-color:#198754!important">
+              <div class="small fw-semibold text-success mb-1">
+                <i class="bi bi-box-seam me-1"></i>Consegna
+              </div>
+              <input type="date" name="data_fornitura" class="form-control form-control-sm"
+                     value="{{ pratica.data_fornitura or '' }}">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-chat-left-text me-2"></i>Note</div>
+      <div class="card-body">
+        <textarea name="note" class="form-control" rows="3" placeholder="Note sulla pratica…">{{ pratica.note or '' }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Genera PDF (solo in modifica) -->
+  {% if pratica.id and templates %}
+  <div class="col-12">
+    <div class="card border-primary">
+      <div class="card-header bg-primary text-white"><i class="bi bi-file-earmark-pdf me-2"></i>Genera documento PDF</div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">Seleziona un template e compila automaticamente il PDF con i dati di questa pratica.</p>
+        <div class="row g-2">
+          {% for t in templates %}
+          <div class="col-md-4">
+            <div class="card border h-100">
+              <div class="card-body d-flex flex-column">
+                <div class="fw-semibold mb-1">{{ t.nome_template }}</div>
+                <div class="text-muted small mb-2">{{ t.tipo_documento or '' }} — {{ t.descrizione or '' }}</div>
+                <a href="{{ url_for('compila_pdf', template_id=t.id, pratica_id=pratica.id) }}"
+                   class="btn btn-sm btn-outline-primary mt-auto">
+                  <i class="bi bi-download me-1"></i> Genera PDF
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% elif pratica.id %}
+  <div class="col-12">
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i>
+      Nessun template PDF configurato. <a href="{{ url_for('nuovo_template') }}">Carica il tuo primo template</a>.
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Pulsanti -->
+  <div class="col-12 d-flex gap-2 justify-content-end">
+    <a href="{{ url_for('pratiche') }}" class="btn btn-outline-secondary">Annulla</a>
+    <button type="submit" class="btn btn-warning text-white px-4">
+      <i class="bi bi-check-lg me-1"></i> Salva pratica
+    </button>
+  </div>
+
+</div>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function caricaDatiCliente(clienteId, forza = false) {
+  if (!clienteId) return;
+  const campoMedico = document.getElementById('input-medico');
+  // Se il campo è già compilato e non è una richiesta forzata, non sovrascrivere
+  if (campoMedico.value.trim() && !forza) return;
+  try {
+    const r = await fetch(`/api/clienti/${clienteId}`);
+    if (!r.ok) return;
+    const c = await r.json();
+    if (c.medico_referente) {
+      campoMedico.value = c.medico_referente;
+      campoMedico.classList.add('border-success');
+      setTimeout(() => campoMedico.classList.remove('border-success'), 1500);
+    }
+  } catch(e) { console.error(e); }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>{{ title }}</h1>
+  <a href="{{ url_for('templates') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Torna ai template
+  </a>
+</div>
+
+{% if not template.id %}
+<!-- Upload nuovo template -->
+<div class="card mb-3">
+  <div class="card-header"><i class="bi bi-upload me-2"></i>Carica file PDF</div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">File PDF *</label>
+          <input type="file" name="file_pdf" class="form-control" accept=".pdf" required>
+          <div class="form-text">Carica il PDF template (modulo con campi o documento statico)</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Nome template *</label>
+          <input type="text" name="nome_template" class="form-control" required placeholder="es. Richiesta Ausilio ASL">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Tipo documento</label>
+          <select name="tipo_documento" class="form-select">
+            <option value="">— Seleziona —</option>
+            <option>Richiesta ausilio</option>
+            <option>Preventivo</option>
+            <option>Collaudo</option>
+            <option>Lettera accompagnatoria</option>
+            <option>Modulo ASL</option>
+            <option>Dichiarazione</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label fw-semibold">Descrizione</label>
+          <input type="text" name="descrizione" class="form-control" placeholder="Breve descrizione del documento…">
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-danger px-4">
+            <i class="bi bi-upload me-1"></i> Carica e configura
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% else %}
+<!-- Modifica mappatura template esistente -->
+<div class="row g-3">
+
+  <!-- Info template -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-info-circle me-2"></i>Informazioni template</div>
+      <div class="card-body">
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nome template</label>
+            <input type="text" name="nome_template" class="form-control" value="{{ template.nome_template }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Tipo documento</label>
+            <select name="tipo_documento" class="form-select">
+              {% for td in ['Richiesta ausilio','Preventivo','Collaudo','Lettera accompagnatoria','Modulo ASL','Dichiarazione','Altro'] %}
+              <option {% if template.tipo_documento == td %}selected{% endif %}>{{ td }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Filtro ASL <small class="text-muted">(lascia vuoto = universale)</small></label>
+            <input type="text" name="asl_filter" class="form-control" value="{{ template.asl_filter or '' }}"
+                   placeholder="es. Roma 2 — mostrato solo per clienti con questa ASL">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Descrizione</label>
+            <input type="text" name="descrizione" class="form-control" value="{{ template.descrizione or '' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mappatura campi (JSON)</label>
+            <textarea name="mappatura" class="form-control font-monospace" rows="14"
+                      placeholder='{"_tipo":"form","campi":{"NomeCampoPDF":"cliente.nome"}}'>{{ template.mappatura or '' }}</textarea>
+            <div class="form-text">
+              Struttura per <strong>form PDF</strong>:
+              <code>{"_tipo":"form","campi":{"NomeCampo":"cliente.nome"}}</code><br>
+              Struttura per <strong>PDF statico</strong>:
+              <code>{"_tipo":"overlay","campi":[{"pagina":0,"x":100,"y":700,"chiave_dati":"cliente.nome","font_size":10}]}</code>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-save me-1"></i> Salva configurazione
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campi rilevati dal PDF -->
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-search me-2"></i>Campi rilevati nel PDF</div>
+      <div class="card-body">
+        {% if campi.tipo == 'form' %}
+        <div class="alert alert-success py-2">
+          <i class="bi bi-check-circle me-1"></i> PDF con <strong>{{ campi.campi_modulo | length }} campi modulo</strong> rilevati (AcroForm).
+          Usa <code>_tipo: "form"</code>.
+        </div>
+        {% if campi.campi_modulo %}
+        <table class="table table-sm table-hover">
+          <thead class="table-light"><tr><th>Nome campo PDF</th><th>Tipo</th><th>Chiave dati suggerita</th></tr></thead>
+          <tbody>
+          {% for campo in campi.campi_modulo %}
+          <tr>
+            <td><code>{{ campo.nome_campo }}</code></td>
+            <td class="text-muted small">{{ campo.tipo or '—' }}</td>
+            <td class="text-muted small">
+              {% set n = campo.nome_campo | lower %}
+              {% if 'nome' in n and 'cog' not in n %}cliente.nome
+              {% elif 'cognome' in n %}cliente.cognome
+              {% elif 'fiscal' in n or 'cf' in n %}cliente.codice_fiscale
+              {% elif 'nasc' in n %}cliente.data_nascita
+              {% elif 'luogo' in n %}cliente.luogo_nascita
+              {% elif 'indir' in n %}cliente.indirizzo
+              {% elif 'cap' in n %}cliente.cap
+              {% elif 'citt' in n %}cliente.citta
+              {% elif 'prov' in n %}cliente.provincia
+              {% elif 'tel' in n %}cliente.telefono
+              {% elif 'email' in n %}cliente.email
+              {% elif 'asl' in n %}cliente.asl_competente
+              {% elif 'medico' in n %}pratica.medico_prescrittore
+              {% elif 'ausil' in n %}pratica.ausilio_richiesto
+              {% elif 'codice' in n %}pratica.codice_ausilio
+              {% elif 'data' in n %}data_oggi
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% else %}
+        <div class="alert alert-warning py-2">
+          <i class="bi bi-exclamation-triangle me-1"></i> PDF <strong>statico</strong> (nessun campo modulo).
+          Usa <code>_tipo: "overlay"</code> con coordinate x/y per ogni campo.
+        </div>
+        <p class="text-muted small">Il PDF ha <strong>{{ campi.pagine }}</strong> pagine.
+        Per posizionare il testo usa le coordinate (x=0 è sinistra, y=0 è basso della pagina).</p>
+        {% endif %}
+
+        <!-- Chiavi dati disponibili -->
+        <div class="mt-3">
+          <div class="fw-semibold small mb-2">Chiavi dati disponibili:</div>
+          <div class="row g-1">
+            {% set chiavi = [
+              ('cliente.nome','Nome cliente'), ('cliente.cognome','Cognome'),
+              ('cliente.codice_fiscale','Cod. fiscale'), ('cliente.data_nascita','Data nascita'),
+              ('cliente.luogo_nascita','Luogo nascita'), ('cliente.indirizzo','Indirizzo'),
+              ('cliente.cap','CAP'), ('cliente.citta','Città'), ('cliente.provincia','Provincia'),
+              ('cliente.telefono','Telefono'), ('cliente.email','Email'),
+              ('cliente.asl_competente','ASL'), ('cliente.medico_referente','Medico ref.'),
+              ('cliente.tipo_disabilita','Tipo disabilità'), ('cliente.grado_invalidita','Grado invalidità'),
+              ('cliente.tutore_cognome','Tutore cognome'), ('cliente.tutore_nome','Tutore nome'),
+              ('pratica.numero_pratica','N° pratica'), ('pratica.tipo_pratica','Tipo pratica'),
+              ('pratica.ente_pubblico','Ente/ASL'), ('pratica.ufficio_protesi','Ufficio protesi'),
+              ('pratica.medico_prescrittore','Medico prescrittore'),
+              ('pratica.ausilio_richiesto','Ausilio'), ('pratica.codice_ausilio','Codice ausilio'),
+              ('pratica.numero_autorizzazione','N° autorizzazione'),
+              ('pratica.data_autorizzazione','Data autorizzazione'),
+              ('pratica.importo_preventivo','Importo prev.'), ('data_oggi','Data odierna')
+            ] %}
+            {% for chiave, label in chiavi %}
+            <div class="col-6">
+              <code class="d-block bg-light rounded px-2 py-1 small mb-1" style="font-size:0.72rem;">
+                <span class="text-muted">{{ label }}:</span> {{ chiave }}
+              </code>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

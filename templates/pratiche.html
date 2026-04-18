@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Pratiche - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-folder2-open me-2 text-warning"></i>Pratiche</h1>
+  <a href="{{ url_for('nuova_pratica') }}" class="btn btn-warning text-white">
+    <i class="bi bi-folder-plus me-1"></i> Nuova pratica
+  </a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="d-flex gap-2 flex-wrap">
+      <input type="text" name="q" value="{{ search }}" class="form-control" style="max-width:300px"
+             placeholder="Cerca numero, cliente, ausilio…">
+      <select name="stato" class="form-select" style="max-width:160px">
+        <option value="">Tutti gli stati</option>
+        {% for s in ['Aperta','In corso','In attesa','Completata','Chiusa'] %}
+        <option value="{{ s }}" {% if stato_filtro == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-outline-primary"><i class="bi bi-search"></i> Filtra</button>
+      {% if search or stato_filtro %}
+      <a href="{{ url_for('pratiche') }}" class="btn btn-outline-secondary">Azzera</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>N° Pratica</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Stato</th>
+          <th>Ente / ASL</th>
+          <th>Ausilio</th>
+          <th>Apertura</th>
+          <th class="text-end">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% set badge_map = {'Aperta':'primary','In corso':'warning','Completata':'success','Chiusa':'secondary','In attesa':'danger'} %}
+      {% for p in pratiche %}
+      <tr>
+        <td><a href="{{ url_for('modifica_pratica', id=p.id) }}" class="fw-semibold text-decoration-none">{{ p.numero_pratica }}</a></td>
+        <td>
+          <a href="{{ url_for('modifica_cliente', id=p.cliente_id) }}" class="text-decoration-none text-dark">
+            {{ p.cognome }} {{ p.nome }}
+          </a>
+        </td>
+        <td><span class="badge bg-light text-dark border">{{ p.tipo_pratica or '—' }}</span></td>
+        <td><span class="badge bg-{{ badge_map.get(p.stato, 'secondary') }}">{{ p.stato }}</span></td>
+        <td class="small text-muted">{{ p.ente_pubblico or '—' }}</td>
+        <td class="small">{{ p.ausilio_richiesto or '—' }}</td>
+        <td class="small text-muted">{{ p.data_apertura or '—' }}</td>
+        <td class="text-end">
+          <a href="{{ url_for('modifica_pratica', id=p.id) }}" class="btn btn-sm btn-outline-primary" title="Apri pratica">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="text-center text-muted py-4">
+        Nessuna pratica trovata.
+        <a href="{{ url_for('nuova_pratica') }}">Crea la prima pratica</a>
+      </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if pratiche %}
+  <div class="card-footer bg-white text-muted small">{{ pratiche | length }} pratica/e trovate</div>
+  {% endif %}
+</div>
+
+{% endblock %}

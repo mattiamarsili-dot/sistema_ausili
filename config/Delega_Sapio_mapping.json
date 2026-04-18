@@ -1,0 +1,34 @@
+{
+  "_tipo": "form",
+  "_asl_filter": "",
+  "_note": "Delega Sapio Life — 2 pagine. AcroForm con campi nominati. Valida per tutte le ASL.",
+  "campi": {
+    "ASL":                "asl_competente",
+    "Nome e Cognome":     "cliente.cognome_nome",
+    "CF":                 "cliente.codice_fiscale",
+    "Contatti":           "cliente.telefono",
+    "Prescrizione":       "pratica.medico_prescrittore",
+    "Data Prescrizione":  "pratica.data_autorizzazione",
+    "Luogo":              "cliente.luogo_nascita",
+    "Data Nascita":       "cliente.data_nascita",
+    "Indirizzo":          "cliente.indirizzo",
+    "Città":              "cliente.citta",
+    "Date2_af_date":      "cliente.anno_residenza",
+    "Data Compil":        "data_oggi",
+
+    "Text11":             "asl_competente",
+    "Text8":              "cliente.cognome_nome",
+    "Text7":              "cliente.anno_residenza",
+    "Text6":              "cliente.data_nascita",
+    "Text5":              "cliente.citta",
+    "Text4":              "cliente.indirizzo",
+    "Text3":              "pratica.importo_preventivo",
+    "Date1_af_date":      "pratica.data_apertura",
+    "Text2":              "pratica.ausilio_richiesto",
+    "Text9":              "pratica.codice_am",
+    "Date3_af_date":      "data_oggi",
+
+    "Text1":              "",
+    "Text10":             "pratica.ausilio_richiesto"
+  }
+}

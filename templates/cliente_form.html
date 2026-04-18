@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-person-vcard me-2 text-primary"></i>{{ title }}</h1>
+  <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Torna ai clienti
+  </a>
+</div>
+
+<form method="post">
+<div class="row g-3">
+
+  <!-- Anagrafica -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-person me-2"></i>Anagrafica</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Cognome *</label>
+            <input type="text" name="cognome" class="form-control" value="{{ cliente.cognome or '' }}" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Nome *</label>
+            <input type="text" name="nome" class="form-control" value="{{ cliente.nome or '' }}" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Sesso</label>
+            <select name="sesso" class="form-select">
+              <option value="">—</option>
+              <option value="M" {% if cliente.sesso == 'M' %}selected{% endif %}>Maschio</option>
+              <option value="F" {% if cliente.sesso == 'F' %}selected{% endif %}>Femmina</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Data nascita</label>
+            <input type="date" name="data_nascita" class="form-control" value="{{ cliente.data_nascita or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Luogo di nascita</label>
+            <input type="text" name="luogo_nascita" class="form-control" value="{{ cliente.luogo_nascita or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Codice fiscale</label>
+            <input type="text" name="codice_fiscale" class="form-control font-monospace text-uppercase"
+                   value="{{ cliente.codice_fiscale or '' }}" maxlength="16">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Residenza -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-geo-alt me-2"></i>Residenza</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Indirizzo</label>
+            <input type="text" name="indirizzo" class="form-control" value="{{ cliente.indirizzo or '' }}">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">CAP</label>
+            <input type="text" name="cap" class="form-control" value="{{ cliente.cap or '' }}" maxlength="5">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Città</label>
+            <input type="text" name="citta" class="form-control" value="{{ cliente.citta or '' }}">
+          </div>
+          <div class="col-md-1">
+            <label class="form-label fw-semibold">Prov.</label>
+            <input type="text" name="provincia" class="form-control" value="{{ cliente.provincia or '' }}" maxlength="2">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Residente dal</label>
+            <input type="number" name="anno_residenza" class="form-control" value="{{ cliente.anno_residenza or '' }}"
+                   min="1900" max="2099" placeholder="es. 2015">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Telefono</label>
+            <input type="tel" name="telefono" class="form-control" value="{{ cliente.telefono or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ cliente.email or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informazioni cliniche / ASL -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-hospital me-2"></i>Informazioni cliniche e ASL</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">ASL competente</label>
+            <select name="asl_competente" class="form-select">
+              <option value="">— Seleziona —</option>
+              {% for a in ['ASL Roma 1','ASL Roma 2','ASL Roma 3','ASL Roma 4','ASL Roma 5','ASL Roma 6'] %}
+              <option value="{{ a }}" {% if cliente.asl_competente == a %}selected{% endif %}>{{ a }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Centro</label>
+            <select name="centro" class="form-select">
+              <option value="">— Seleziona —</option>
+              {% for c in ['ASL','Campus','Capo Darco','CPA','CTO','Gemelli','HBG','Nemo','PTV','PUPrimo','Sabelli',"Sant'Andrea",'Santa Lucia','VillaFulvia','Wildm'] %}
+              <option value="{{ c }}" {% if cliente.centro == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Medico referente</label>
+            <input type="text" name="medico_referente" class="form-control" value="{{ cliente.medico_referente or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Patologia</label>
+            <input type="text" name="tipo_disabilita" class="form-control" value="{{ cliente.tipo_disabilita or '' }}"
+                   placeholder="es. SLA, sclerosi multipla, distrofia…">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documento d'identità cliente -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-card-text me-2"></i>Documento d'identità cliente</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Tipo documento</label>
+            <select name="doc_tipo" class="form-select">
+              <option value="">—</option>
+              {% for d in ['Carta d\'identità','Passaporto','Patente','Permesso di soggiorno'] %}
+              <option {% if cliente.doc_tipo == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Numero</label>
+            <input type="text" name="doc_numero" class="form-control font-monospace text-uppercase" value="{{ cliente.doc_numero or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Rilasciato il</label>
+            <input type="date" name="doc_rilascio" class="form-control" value="{{ cliente.doc_rilascio or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutore/Familiare / Delegato -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-person-hearts me-2"></i>Delegato / Tutore / Familiare di riferimento</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Cognome delegato</label>
+            <input type="text" name="tutore_cognome" class="form-control" value="{{ cliente.tutore_cognome or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Nome delegato</label>
+            <input type="text" name="tutore_nome" class="form-control" value="{{ cliente.tutore_nome or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Telefono delegato</label>
+            <input type="tel" name="tutore_telefono" class="form-control" value="{{ cliente.tutore_telefono or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Luogo nascita delegato</label>
+            <input type="text" name="tutore_luogo_nascita" class="form-control" value="{{ cliente.tutore_luogo_nascita or '' }}">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold">Prov.</label>
+            <input type="text" name="tutore_provincia_nascita" class="form-control" maxlength="2" value="{{ cliente.tutore_provincia_nascita or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Data nascita delegato</label>
+            <input type="date" name="tutore_data_nascita" class="form-control" value="{{ cliente.tutore_data_nascita or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Cognome Nome (campo unico)</label>
+            <input type="text" name="tutore_cognome_nome" class="form-control" value="{{ cliente.tutore_cognome_nome or '' }}"
+                   placeholder="Es: Rossi Mario (per campi unici del modulo)">
+          </div>
+          <hr class="my-1">
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Tipo doc. delegato</label>
+            <select name="tutore_doc_tipo" class="form-select">
+              <option value="">—</option>
+              {% for d in ['Carta d\'identità','Passaporto','Patente','Permesso di soggiorno'] %}
+              <option {% if cliente.tutore_doc_tipo == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Numero doc. delegato</label>
+            <input type="text" name="tutore_doc_numero" class="form-control font-monospace text-uppercase" value="{{ cliente.tutore_doc_numero or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Rilasciato il</label>
+            <input type="date" name="tutore_doc_rilascio" class="form-control" value="{{ cliente.tutore_doc_rilascio or '' }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-chat-left-text me-2"></i>Note</div>
+      <div class="card-body">
+        <textarea name="note" class="form-control" rows="3" placeholder="Note libere sul cliente…">{{ cliente.note or '' }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pratiche collegate (solo in modifica) -->
+  {% if pratiche %}
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-folder2-open me-2"></i>Pratiche collegate</span>
+        <a href="{{ url_for('nuova_pratica') }}?cliente_id={{ cliente.id }}" class="btn btn-sm btn-outline-warning">
+          <i class="bi bi-folder-plus me-1"></i> Nuova pratica
+        </a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light"><tr><th>N° pratica</th><th>Tipo</th><th>Stato</th><th>Apertura</th><th>Ausilio</th><th></th></tr></thead>
+          <tbody>
+          {% for p in pratiche %}
+          {% set badge_map = {'Aperta':'primary','In corso':'warning','Completata':'success','Chiusa':'secondary','In attesa':'danger'} %}
+          <tr>
+            <td><a href="{{ url_for('modifica_pratica', id=p.id) }}" class="fw-semibold text-decoration-none">{{ p.numero_pratica }}</a></td>
+            <td class="small">{{ p.tipo_pratica or '—' }}</td>
+            <td><span class="badge bg-{{ badge_map.get(p.stato, 'secondary') }}">{{ p.stato }}</span></td>
+            <td class="small text-muted">{{ p.data_apertura or '—' }}</td>
+            <td class="small">{{ p.ausilio_richiesto or '—' }}</td>
+            <td><a href="{{ url_for('modifica_pratica', id=p.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-right"></i></a></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Pulsanti -->
+  <div class="col-12 d-flex gap-2 justify-content-end">
+    <a href="{{ url_for('clienti') }}" class="btn btn-outline-secondary">Annulla</a>
+    <button type="submit" class="btn btn-primary px-4">
+      <i class="bi bi-check-lg me-1"></i> Salva cliente
+    </button>
+  </div>
+
+</div>
+</form>
+
+{% endblock %}

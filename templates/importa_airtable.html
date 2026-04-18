@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}Importa da Airtable - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-table me-2 text-primary"></i>Importa da Airtable</h1>
+</div>
+
+<!-- Stato database attuale -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card" style="background: linear-gradient(135deg,#4361ee,#3a0ca3);">
+      <div class="stat-value">{{ stats.totale_clienti }}</div>
+      <div class="stat-label">Clienti nel database</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card" style="background: linear-gradient(135deg,#f72585,#b5179e);">
+      <div class="stat-value">{{ stats.pratiche_totali }}</div>
+      <div class="stat-label">Pratiche nel database</div>
+    </div>
+  </div>
+</div>
+
+<!-- Configurazione chiave API -->
+{% if not key_ok %}
+<div class="card mb-4 border-warning">
+  <div class="card-header bg-warning text-dark">
+    <i class="bi bi-key-fill me-2"></i>Configura chiave API Airtable
+  </div>
+  <div class="card-body">
+    <p class="text-muted small mb-3">
+      Per importare da Airtable ti serve un <strong>Personal Access Token</strong>.
+      Vai su <a href="https://airtable.com/account" target="_blank">airtable.com/account</a>
+      → <em>Developer Hub</em> → <em>Personal access tokens</em> → crea un token con scope
+      <code>data.records:read</code> e <code>schema.bases:read</code>.
+    </p>
+    <div class="input-group" style="max-width:520px">
+      <input type="password" id="input-chiave" class="form-control font-monospace"
+             placeholder="patXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+      <button class="btn btn-warning" onclick="salvaChiave()">
+        <i class="bi bi-save me-1"></i>Salva
+      </button>
+    </div>
+    <div id="msg-chiave" class="mt-2"></div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-success d-flex align-items-center gap-2 mb-4">
+  <i class="bi bi-check-circle-fill"></i>
+  <div>Chiave API Airtable configurata correttamente.
+    <a href="#" onclick="cambiaChiave()" class="ms-2 small">Cambia chiave</a>
+  </div>
+</div>
+
+<!-- Form cambio chiave (nascosto) -->
+<div id="form-cambio-chiave" class="card mb-4 border-secondary" style="display:none">
+  <div class="card-body">
+    <div class="input-group" style="max-width:520px">
+      <input type="password" id="input-chiave" class="form-control font-monospace"
+             placeholder="patXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
+      <button class="btn btn-secondary" onclick="salvaChiave()">
+        <i class="bi bi-save me-1"></i>Salva nuova chiave
+      </button>
+    </div>
+    <div id="msg-chiave" class="mt-2"></div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Pannello importazione -->
+<div class="card mb-4">
+  <div class="card-header d-flex align-items-center gap-2">
+    <i class="bi bi-cloud-arrow-down text-primary"></i>
+    <span class="fw-semibold">Importazione da CRM Pazienti</span>
+  </div>
+  <div class="card-body">
+    <p class="text-muted small mb-4">
+      Il sistema importerà tutti i pazienti e le pratiche dalla base Airtable
+      <strong>CRM Pazienti</strong> nel database locale.
+      I clienti già presenti (stesso codice fiscale) verranno <em>aggiornati</em>, non duplicati.
+      Le pratiche vengono importate come nuove.
+    </p>
+
+    <div class="d-flex gap-3 align-items-center flex-wrap">
+      <button class="btn btn-outline-secondary" id="btn-dryrun"
+              onclick="avviaImportazione(true)" {% if not key_ok %}disabled{% endif %}>
+        <i class="bi bi-eye me-1"></i>Test (dry-run)
+        <span class="badge bg-secondary ms-1">Nessuna modifica</span>
+      </button>
+      <button class="btn btn-primary px-4" id="btn-importa"
+              onclick="avviaImportazione(false)" {% if not key_ok %}disabled{% endif %}>
+        <i class="bi bi-cloud-download me-1"></i>Importa tutto
+      </button>
+    </div>
+
+    <!-- Spinner -->
+    <div id="spinner" class="mt-4 text-center" style="display:none">
+      <div class="spinner-border text-primary"></div>
+      <div class="mt-2 text-muted">Importazione in corso da Airtable…</div>
+    </div>
+
+    <!-- Risultati -->
+    <div id="risultati" class="mt-4"></div>
+  </div>
+</div>
+
+<!-- Info campi importati -->
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-info-circle me-2 text-info"></i>Campi importati
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="fw-semibold small mb-1">Anagrafica cliente (da Pazienti)</p>
+        <ul class="small text-muted">
+          <li>Cognome e Nome (campo combinato, gestisce cognomi composti)</li>
+          <li>Codice Fiscale</li>
+          <li>Data e luogo di nascita</li>
+          <li>Indirizzo, città, CAP (estratti da testo libero)</li>
+          <li>Telefono, email</li>
+          <li>ASL competente (RM1→Roma 1, RM2→Roma 2, RM3→Roma 3)</li>
+          <li>Note + link cartella Drive</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <p class="fw-semibold small mb-1">Pratiche (da Pratiche)</p>
+        <ul class="small text-muted">
+          <li>Ausilio richiesto</li>
+          <li>Stato (Segnalato→Aperta, ASL→In attesa, Fattura→Completata…)</li>
+          <li>Data apertura, data fornitura, data autorizzazione</li>
+          <li>Importo preventivo</li>
+          <li>Note</li>
+          <li>Collegamento al cliente tramite record ID</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-light border small mt-2 mb-0">
+      <i class="bi bi-lightbulb me-1 text-warning"></i>
+      <strong>Consiglio:</strong> aggiungi su Airtable (tabella Pratiche) i campi
+      <em>Medico Prescrittore</em>, <em>N° Autorizzazione ASL</em> e <em>Ufficio Protesi</em>
+      per importarli automaticamente in futuro.
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function cambiaChiave() {
+  document.getElementById('form-cambio-chiave').style.display = 'block';
+}
+
+async function salvaChiave() {
+  const chiave = document.getElementById('input-chiave').value.trim();
+  if (!chiave) { alert('Inserisci la chiave'); return; }
+  const r = await fetch('/api/airtable/salva-chiave', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chiave})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById('msg-chiave').innerHTML =
+      '<span class="text-success"><i class="bi bi-check-circle me-1"></i>Chiave salvata! Ricarica la pagina.</span>';
+    setTimeout(() => location.reload(), 1500);
+  } else {
+    document.getElementById('msg-chiave').innerHTML =
+      `<span class="text-danger">${d.errore}</span>`;
+  }
+}
+
+let polling = null;
+
+async function avviaImportazione(dryRun) {
+  document.getElementById('btn-importa').disabled = true;
+  document.getElementById('btn-dryrun').disabled = true;
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('risultati').innerHTML = '';
+
+  const r = await fetch('/api/airtable/importa', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({dry_run: dryRun})
+  });
+  const d = await r.json();
+  if (d.errore) {
+    mostraErrore(d.errore);
+    return;
+  }
+
+  // Polling ogni 1 secondo finché non finisce
+  polling = setInterval(controllaStato, 1000);
+}
+
+async function controllaStato() {
+  try {
+    const r = await fetch('/api/airtable/stato');
+    const d = await r.json();
+
+    if (!d.running) {
+      clearInterval(polling);
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('btn-importa').disabled = false;
+      document.getElementById('btn-dryrun').disabled = false;
+
+      if (d.errore) {
+        mostraErrore(d.errore);
+      } else if (d.risultato) {
+        mostraRisultato(d.risultato);
+      }
+    }
+  } catch(e) {
+    clearInterval(polling);
+    mostraErrore('Errore di rete: ' + e);
+  }
+}
+
+function mostraErrore(msg) {
+  document.getElementById('spinner').style.display = 'none';
+  document.getElementById('btn-importa').disabled = false;
+  document.getElementById('btn-dryrun').disabled = false;
+  document.getElementById('risultati').innerHTML = `
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Errore:</strong> ${msg}
+    </div>`;
+}
+
+function mostraRisultato(res) {
+  const p = res.pazienti || {};
+  const pr = res.pratiche || {};
+  const isDry = p.aggiornati === undefined; // in dry_run aggiornati non viene restituito correttamente
+
+  document.getElementById('risultati').innerHTML = `
+    <div class="alert alert-success border-success">
+      <h6 class="alert-heading mb-3">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        ${isDry ? 'Simulazione completata' : 'Importazione completata!'}
+      </h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="border rounded p-3 bg-white">
+            <div class="fw-semibold mb-2"><i class="bi bi-people me-1"></i>Pazienti</div>
+            <table class="table table-sm table-borderless mb-0 small">
+              <tr><td class="text-muted">Totale trovati in Airtable</td><td class="fw-bold">${p.totale || 0}</td></tr>
+              <tr><td class="text-muted">Nuovi inseriti</td><td class="fw-bold text-success">${p.nuovi || 0}</td></tr>
+              <tr><td class="text-muted">Aggiornati (stesso CF)</td><td class="fw-bold text-primary">${p.aggiornati || 0}</td></tr>
+              <tr><td class="text-muted">Saltati (senza nome)</td><td class="fw-bold text-muted">${p.saltati || 0}</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="border rounded p-3 bg-white">
+            <div class="fw-semibold mb-2"><i class="bi bi-folder2-open me-1"></i>Pratiche</div>
+            <table class="table table-sm table-borderless mb-0 small">
+              <tr><td class="text-muted">Totale trovate in Airtable</td><td class="fw-bold">${pr.totale || 0}</td></tr>
+              <tr><td class="text-muted">Importate</td><td class="fw-bold text-success">${pr.nuovi || 0}</td></tr>
+              <tr><td class="text-muted">Saltate (cliente non trovato)</td><td class="fw-bold text-muted">${pr.saltati || 0}</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      ${!isDry ? '<div class="mt-3"><a href="/clienti" class="btn btn-sm btn-outline-success me-2"><i class="bi bi-people me-1"></i>Vedi clienti</a><a href="/pratiche" class="btn btn-sm btn-outline-primary"><i class="bi bi-folder2-open me-1"></i>Vedi pratiche</a></div>' : ''}
+    </div>`;
+}
+</script>
+{% endblock %}

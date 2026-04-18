@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Trova Coordinate PDF — Sistema Ausili</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #eee; }
+
+    .toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: #16213e; border-bottom: 2px solid #0f3460;
+      padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .toolbar h1 { font-size: 1rem; color: #4db8ff; white-space: nowrap; }
+
+    #fileInput { display: none; }
+    .btn {
+      background: #0f3460; color: #fff; border: none; padding: 6px 14px;
+      border-radius: 6px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
+    }
+    .btn:hover { background: #e94560; }
+    .btn-green { background: #27ae60; }
+    .btn-green:hover { background: #1e8449; }
+
+    #coord-display {
+      background: #0f3460; border-radius: 6px; padding: 6px 14px;
+      font-family: monospace; font-size: 1rem; color: #ffd700; min-width: 180px;
+    }
+    #click-display {
+      background: #1a3a1a; border-radius: 6px; padding: 6px 14px;
+      font-family: monospace; font-size: 0.85rem; color: #90ee90; min-width: 300px;
+    }
+
+    #page-select { background: #0f3460; color: #fff; border: 1px solid #4db8ff; padding: 5px 8px; border-radius: 6px; }
+    #scale-select { background: #0f3460; color: #fff; border: 1px solid #4db8ff; padding: 5px 8px; border-radius: 6px; }
+
+    label { font-size: 0.82rem; color: #a0b0cc; }
+
+    .main { padding-top: 70px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+
+    #canvas-wrapper {
+      position: relative; display: inline-block;
+      margin: 20px auto; cursor: crosshair;
+    }
+    #pdf-canvas { display: block; }
+    #grid-canvas {
+      position: absolute; top: 0; left: 0; pointer-events: none;
+    }
+    #dot-canvas {
+      position: absolute; top: 0; left: 0; pointer-events: none;
+    }
+
+    .instructions {
+      max-width: 600px; margin: 30px auto; padding: 20px;
+      background: #16213e; border-radius: 12px; text-align: center;
+    }
+    .instructions p { color: #a0b0cc; margin: 8px 0; line-height: 1.5; }
+    .instructions .highlight { color: #4db8ff; font-weight: 600; }
+
+    #clicked-points {
+      position: fixed; right: 12px; bottom: 12px;
+      background: #16213e; border: 1px solid #0f3460;
+      border-radius: 8px; padding: 10px 14px; max-width: 360px;
+      max-height: 300px; overflow-y: auto; font-size: 0.8rem;
+      display: none;
+    }
+    #clicked-points h3 { color: #4db8ff; margin-bottom: 6px; font-size: 0.9rem; }
+    .point-row { font-family: monospace; color: #90ee90; margin: 3px 0; cursor: pointer; }
+    .point-row:hover { color: #ffd700; }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>📐 Trova Coordinate PDF</h1>
+  <button class="btn" onclick="document.getElementById('fileInput').click()">📂 Apri PDF</button>
+  <input type="file" id="fileInput" accept=".pdf" onchange="loadPDF(event)">
+
+  <label>Pagina:
+    <select id="page-select" onchange="renderPage()">
+      <option value="1">1</option>
+    </select>
+  </label>
+
+  <label>Zoom:
+    <select id="scale-select" onchange="renderPage()">
+      <option value="1">100%</option>
+      <option value="1.5" selected>150%</option>
+      <option value="2">200%</option>
+    </select>
+  </label>
+
+  <label><input type="checkbox" id="show-grid" checked onchange="drawGrid()"> Griglia</label>
+  <label><input type="checkbox" id="show-numbers" checked onchange="drawGrid()"> Numeri</label>
+
+  <div id="coord-display">x: — &nbsp; y: —</div>
+  <div id="click-display">Click per copiare coordinate JSON</div>
+
+  <button class="btn btn-green" onclick="copyAllPoints()" id="copy-btn" style="display:none">📋 Copia tutti i punti</button>
+  <button class="btn" onclick="clearPoints()" id="clear-btn" style="display:none">🗑 Pulisci</button>
+</div>
+
+<div class="main">
+  <div id="instructions" class="instructions">
+    <p class="highlight">Strumento per trovare le coordinate nei PDF</p>
+    <p>Clicca <strong>Apri PDF</strong> e seleziona il file<br>
+    <code style="color:#ffd700">Deleghe_Rm3.pdf</code></p>
+    <p style="margin-top:12px;">Le coordinate PDF usano questo sistema:<br>
+    <strong style="color:#4db8ff">x = 0 a sinistra → 595 a destra</strong><br>
+    <strong style="color:#ff9999">y = 0 in basso → 842 in alto</strong></p>
+    <p style="margin-top:12px; color:#90ee90;">Muovi il mouse sul PDF → vedi le coordinate in tempo reale<br>
+    Clicca → salva il punto e genera il JSON per la mappatura</p>
+  </div>
+
+  <div id="canvas-wrapper" style="display:none"
+       onmousemove="onMouseMove(event)"
+       onmouseleave="onMouseLeave()"
+       onclick="onCanvasClick(event)">
+    <canvas id="pdf-canvas"></canvas>
+    <canvas id="grid-canvas"></canvas>
+    <canvas id="dot-canvas"></canvas>
+  </div>
+</div>
+
+<div id="clicked-points">
+  <h3>📍 Punti salvati</h3>
+  <div id="points-list"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+<script type="module">
+  // Carica PDF.js
+  const { getDocument, GlobalWorkerOptions } = await import(
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs'
+  );
+  GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+
+  let pdfDoc = null;
+  let pageHeight = 842;
+  let currentScale = 1.5;
+  let clickedPoints = [];
+
+  window.loadPDF = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const arrayBuffer = await file.arrayBuffer();
+    pdfDoc = await getDocument({ data: arrayBuffer }).promise;
+
+    const sel = document.getElementById('page-select');
+    sel.innerHTML = '';
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+      sel.innerHTML += `<option value="${i}">Pagina ${i}</option>`;
+    }
+
+    document.getElementById('instructions').style.display = 'none';
+    document.getElementById('canvas-wrapper').style.display = 'inline-block';
+    await renderPageInner();
+  };
+
+  window.renderPage = async function() {
+    await renderPageInner();
+  };
+
+  async function renderPageInner() {
+    if (!pdfDoc) return;
+    const pageNum = parseInt(document.getElementById('page-select').value);
+    currentScale   = parseFloat(document.getElementById('scale-select').value);
+
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: currentScale });
+    pageHeight = page.getViewport({ scale: 1 }).height;
+
+    const pdfCanvas  = document.getElementById('pdf-canvas');
+    const gridCanvas = document.getElementById('grid-canvas');
+    const dotCanvas  = document.getElementById('dot-canvas');
+
+    [pdfCanvas, gridCanvas, dotCanvas].forEach(c => {
+      c.width  = viewport.width;
+      c.height = viewport.height;
+    });
+
+    const ctx = pdfCanvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    drawGrid();
+    redrawDots();
+  }
+
+  window.drawGrid = function() {
+    if (!pdfDoc) return;
+    const gridCanvas = document.getElementById('grid-canvas');
+    const c = gridCanvas.getContext('2d');
+    const w = gridCanvas.width;
+    const h = gridCanvas.height;
+    const showGrid    = document.getElementById('show-grid').checked;
+    const showNumbers = document.getElementById('show-numbers').checked;
+
+    c.clearRect(0, 0, w, h);
+    if (!showGrid && !showNumbers) return;
+
+    const step = 50 * currentScale;
+
+    // Linee verticali (X)
+    for (let px = 0; px <= w; px += step) {
+      const pdfX = Math.round(px / currentScale);
+      const isMajor = pdfX % 100 === 0;
+      c.strokeStyle = isMajor ? 'rgba(77,184,255,0.5)' : 'rgba(77,184,255,0.2)';
+      c.lineWidth = isMajor ? 0.8 : 0.4;
+      if (showGrid) { c.beginPath(); c.moveTo(px, 0); c.lineTo(px, h); c.stroke(); }
+      if (showNumbers && isMajor && pdfX > 0) {
+        c.fillStyle = 'rgba(0,100,255,0.85)';
+        c.font = `bold ${Math.max(9, 10*currentScale)}px monospace`;
+        c.fillText(pdfX, px + 2, 14 * currentScale);
+      }
+    }
+
+    // Linee orizzontali (Y) — y cresce verso l'alto nel PDF, verso il basso nel canvas
+    for (let py = 0; py <= h; py += step) {
+      const pdfY = Math.round((h - py) / currentScale);
+      const isMajor = pdfY % 100 === 0;
+      c.strokeStyle = isMajor ? 'rgba(255,100,100,0.5)' : 'rgba(255,100,100,0.2)';
+      c.lineWidth = isMajor ? 0.8 : 0.4;
+      if (showGrid) { c.beginPath(); c.moveTo(0, py); c.lineTo(w, py); c.stroke(); }
+      if (showNumbers && isMajor && pdfY > 0 && pdfY < pageHeight) {
+        c.fillStyle = 'rgba(220,50,50,0.85)';
+        c.font = `bold ${Math.max(9, 10*currentScale)}px monospace`;
+        c.fillText(pdfY, 2, py - 2);
+      }
+    }
+  };
+
+  function canvasToPdf(canvasX, canvasY) {
+    const wrapper = document.getElementById('canvas-wrapper');
+    const rect    = document.getElementById('pdf-canvas').getBoundingClientRect();
+    const relX    = canvasX - rect.left;
+    const relY    = canvasY - rect.top;
+    const pdfX    = Math.round(relX / currentScale);
+    const pdfY    = Math.round(pageHeight - (relY / currentScale));
+    return { x: pdfX, y: pdfY };
+  }
+
+  window.onMouseMove = function(event) {
+    const { x, y } = canvasToPdf(event.clientX, event.clientY);
+    document.getElementById('coord-display').innerHTML = `x: <b>${x}</b> &nbsp; y: <b>${y}</b>`;
+  };
+
+  window.onMouseLeave = function() {
+    document.getElementById('coord-display').innerHTML = 'x: — &nbsp; y: —';
+  };
+
+  window.onCanvasClick = function(event) {
+    const { x, y } = canvasToPdf(event.clientX, event.clientY);
+    const pageNum   = parseInt(document.getElementById('page-select').value);
+    const point     = { pagina: pageNum - 1, x, y, chiave_dati: "???", font_size: 10 };
+    clickedPoints.push(point);
+
+    document.getElementById('click-display').textContent =
+      `✓ Salvato: pagina ${pageNum-1}, x=${x}, y=${y}`;
+
+    document.getElementById('clicked-points').style.display = 'block';
+    document.getElementById('copy-btn').style.display = 'inline-block';
+    document.getElementById('clear-btn').style.display = 'inline-block';
+    updatePointsList();
+    redrawDots();
+  };
+
+  function redrawDots() {
+    const dotCanvas = document.getElementById('dot-canvas');
+    const c = dotCanvas.getContext('2d');
+    c.clearRect(0, 0, dotCanvas.width, dotCanvas.height);
+
+    const pageNum = parseInt(document.getElementById('page-select').value) - 1;
+    clickedPoints.filter(p => p.pagina === pageNum).forEach((p, i) => {
+      const cx = p.x * currentScale;
+      const cy = (pageHeight - p.y) * currentScale;
+      c.beginPath();
+      c.arc(cx, cy, 5, 0, Math.PI * 2);
+      c.fillStyle = 'rgba(255,80,80,0.8)';
+      c.fill();
+      c.fillStyle = '#fff';
+      c.font = 'bold 10px monospace';
+      c.fillText(i + 1, cx + 7, cy + 4);
+    });
+  }
+
+  function updatePointsList() {
+    const list = document.getElementById('points-list');
+    list.innerHTML = clickedPoints.map((p, i) => {
+      const json = JSON.stringify(p);
+      return `<div class="point-row" onclick="copyToClipboard('${json.replace(/'/g, "\\'")}')" title="Click per copiare">
+        ${i+1}. pag${p.pagina} x=${p.x} y=${p.y}
+      </div>`;
+    }).join('');
+  }
+
+  window.copyAllPoints = function() {
+    const json = JSON.stringify(clickedPoints, null, 2);
+    copyToClipboard(json);
+    document.getElementById('click-display').textContent = '✅ Tutti i punti copiati negli appunti!';
+  };
+
+  window.clearPoints = function() {
+    clickedPoints = [];
+    document.getElementById('points-list').innerHTML = '';
+    document.getElementById('clicked-points').style.display = 'none';
+    document.getElementById('copy-btn').style.display = 'none';
+    document.getElementById('clear-btn').style.display = 'none';
+    document.getElementById('click-display').textContent = 'Click per copiare coordinate JSON';
+    redrawDots();
+  };
+
+  window.copyToClipboard = function(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('click-display').textContent = '✅ Copiato negli appunti!';
+      setTimeout(() => {
+        document.getElementById('click-display').textContent = 'Click per copiare coordinate JSON';
+      }, 2000);
+    });
+  };
+</script>
+</body>
+</html>

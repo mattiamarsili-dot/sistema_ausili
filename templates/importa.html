@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block title %}Importa da Drive - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-cloud-arrow-down me-2 text-success"></i>Importa da Google Drive</h1>
+</div>
+
+<div class="alert alert-info d-flex gap-2 align-items-start">
+  <i class="bi bi-info-circle-fill mt-1"></i>
+  <div>
+    Sfoglia le cartelle Drive, seleziona uno o più PDF (prescrizioni, deleghe compilate, pratiche)
+    e il sistema estrarrà automaticamente i dati anagrafici e clinici con l'intelligenza artificiale.
+    Potrai rivedere e correggere prima del salvataggio.
+  </div>
+</div>
+
+<!-- Navigazione cartelle -->
+<div class="card mb-3">
+  <div class="card-header d-flex align-items-center gap-2">
+    <i class="bi bi-folder2-open text-warning"></i>
+    <span class="fw-semibold">Google Drive</span>
+    <span class="text-muted small ms-2">{{ contenuto.path_corrente }}</span>
+    {% if contenuto.path_padre %}
+    <a href="{{ url_for('importa') }}?path={{ contenuto.path_padre | urlencode }}"
+       class="btn btn-sm btn-outline-secondary ms-auto">
+      <i class="bi bi-arrow-up"></i> Su
+    </a>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+
+    {% if contenuto.errore %}
+    <div class="alert alert-warning m-3">{{ contenuto.errore }}</div>
+    {% endif %}
+
+    <!-- Cartelle -->
+    {% for c in contenuto.cartelle %}
+    <a href="{{ url_for('importa') }}?path={{ c.path | urlencode }}"
+       class="d-flex align-items-center gap-2 px-3 py-2 border-bottom text-decoration-none text-dark hover-bg">
+      <i class="bi bi-folder-fill text-warning"></i>
+      <span>{{ c.nome }}</span>
+      {% if contenuto.pdf | selectattr('path', 'defined') | list | length == 0 %}{% endif %}
+    </a>
+    {% endfor %}
+
+    <!-- PDF selezionabili -->
+    {% if contenuto.pdf %}
+    <div class="px-3 pt-2 pb-1">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <small class="text-muted">{{ contenuto.pdf | length }} PDF in questa cartella</small>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" onclick="selezionaTutti()">
+            <i class="bi bi-check-all"></i> Seleziona tutti
+          </button>
+          <button class="btn btn-sm btn-success" id="btn-analizza" onclick="avviaAnalisi()" disabled>
+            <i class="bi bi-cpu me-1"></i> Analizza con AI
+          </button>
+          <button class="btn btn-sm btn-outline-success" onclick="analizzaCartella('{{ contenuto.path_corrente }}')" title="Analizza tutti i PDF della cartella come pratica unica">
+            <i class="bi bi-folder-symlink me-1"></i> Analizza cartella pratica
+          </button>
+        </div>
+      </div>
+      {% for p in contenuto.pdf %}
+      <div class="form-check py-1 border-bottom">
+        <input class="form-check-input pdf-check" type="checkbox" value="{{ p.path }}"
+               id="pdf_{{ loop.index }}" onchange="aggiornaPulsante()">
+        <label class="form-check-label d-flex align-items-center gap-2" for="pdf_{{ loop.index }}">
+          <i class="bi bi-file-earmark-pdf text-danger"></i>
+          {{ p.nome }}
+          <span class="text-muted small">{{ p.size_kb }} KB</span>
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif not contenuto.cartelle %}
+    <div class="text-center text-muted py-4">Nessun PDF in questa cartella</div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Spinner analisi -->
+<div id="spinner" class="text-center py-4" style="display:none!important">
+  <div class="spinner-border text-success"></div>
+  <div class="mt-2 text-muted">Analisi in corso con AI… potrebbe richiedere qualche secondo per file.</div>
+</div>
+
+<!-- Risultati estratti -->
+<div id="risultati"></div>
+
+<style>
+  .hover-bg:hover { background: #f8f9fa; }
+  .campo-estratto { border-left: 3px solid #28a745; background: #f0fff4; }
+  .campo-vuoto { border-left: 3px solid #dee2e6; }
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function aggiornaPulsante() {
+  const selezionati = document.querySelectorAll('.pdf-check:checked').length;
+  document.getElementById('btn-analizza').disabled = selezionati === 0;
+}
+
+function selezionaTutti() {
+  document.querySelectorAll('.pdf-check').forEach(c => c.checked = true);
+  aggiornaPulsante();
+}
+
+async function avviaAnalisi() {
+  const paths = [...document.querySelectorAll('.pdf-check:checked')].map(c => c.value);
+  if (!paths.length) return;
+  mostraSpinner(true);
+  try {
+    const r = await fetch('/api/analizza', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({paths})
+    });
+    const dati = await r.json();
+    mostraRisultati(dati);
+  } catch(e) {
+    alert('Errore: ' + e);
+  }
+  mostraSpinner(false);
+}
+
+async function analizzaCartella(path) {
+  mostraSpinner(true);
+  try {
+    const r = await fetch('/api/analizza-cartella', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({path})
+    });
+    const dati = await r.json();
+    mostraRisultati(dati);
+  } catch(e) {
+    alert('Errore: ' + e);
+  }
+  mostraSpinner(false);
+}
+
+function mostraSpinner(show) {
+  document.getElementById('spinner').style.display = show ? 'block' : 'none!important';
+}
+
+function mostraRisultati(lista) {
+  const div = document.getElementById('risultati');
+  div.innerHTML = '';
+  lista.forEach((dati, i) => {
+    if (dati.errore) {
+      div.innerHTML += `<div class="alert alert-danger"><b>${dati._file || 'File'}:</b> ${dati.errore}</div>`;
+      return;
+    }
+    div.innerHTML += creaFormScheda(dati, i);
+  });
+}
+
+function creaFormScheda(d, idx) {
+  const c = d.cliente || {};
+  const p = d.pratica || {};
+  const classe = (val) => val ? 'campo-estratto' : 'campo-vuoto';
+  const val = (v) => v || '';
+
+  return `
+  <div class="card mb-4 border-success">
+    <div class="card-header bg-success text-white d-flex justify-content-between">
+      <span><i class="bi bi-file-earmark-check me-2"></i>${d._file || 'Documento'} — ${d.tipo_documento || ''}</span>
+      <span class="badge bg-light text-dark">${d._scansionato ? 'Scansionato (vision AI)' : 'Testo estratto'}</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">Verifica e correggi i dati estratti, poi clicca <strong>Salva</strong>.</p>
+      <form method="post" action="/importa/salva">
+        <input type="hidden" name="cliente_id" value="">
+
+        <div class="row g-2 mb-3">
+          <div class="col-12"><strong>Anagrafica cliente</strong></div>
+          <div class="col-md-4">
+            <label class="form-label small">Cognome</label>
+            <input name="cognome" class="form-control form-control-sm ${classe(c.cognome)}" value="${val(c.cognome)}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Nome</label>
+            <input name="nome" class="form-control form-control-sm ${classe(c.nome)}" value="${val(c.nome)}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Codice Fiscale</label>
+            <input name="codice_fiscale" class="form-control form-control-sm font-monospace text-uppercase ${classe(c.codice_fiscale)}" value="${val(c.codice_fiscale)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Data nascita</label>
+            <input type="date" name="data_nascita" class="form-control form-control-sm ${classe(c.data_nascita)}" value="${val(c.data_nascita)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Luogo nascita</label>
+            <input name="luogo_nascita" class="form-control form-control-sm ${classe(c.luogo_nascita)}" value="${val(c.luogo_nascita)}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Indirizzo</label>
+            <input name="indirizzo" class="form-control form-control-sm ${classe(c.indirizzo)}" value="${val(c.indirizzo)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Città</label>
+            <input name="citta" class="form-control form-control-sm ${classe(c.citta)}" value="${val(c.citta)}">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small">Telefono</label>
+            <input name="telefono" class="form-control form-control-sm ${classe(c.telefono)}" value="${val(c.telefono)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">ASL competente</label>
+            <input name="asl_competente" class="form-control form-control-sm ${classe(c.asl_competente)}" value="${val(c.asl_competente)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Tipo disabilità</label>
+            <input name="tipo_disabilita" class="form-control form-control-sm ${classe(c.tipo_disabilita)}" value="${val(c.tipo_disabilita)}">
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-12"><strong>Pratica</strong></div>
+          <div class="col-md-4">
+            <label class="form-label small">Ausilio richiesto</label>
+            <input name="ausilio_richiesto" class="form-control form-control-sm ${classe(p.ausilio_richiesto)}" value="${val(p.ausilio_richiesto)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Tipo pratica</label>
+            <select name="tipo_pratica" class="form-select form-select-sm">
+              ${['Valutazione','Fornitura','Assistenza','Riparazione','Collaudo'].map(t =>
+                `<option ${t === p.tipo_pratica ? 'selected' : ''}>${t}</option>`
+              ).join('')}
+            </select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label small">Medico prescrittore</label>
+            <input name="medico_prescrittore" class="form-control form-control-sm ${classe(p.medico_prescrittore)}" value="${val(p.medico_prescrittore)}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Ente / ASL</label>
+            <input name="ente_pubblico" class="form-control form-control-sm ${classe(p.ente_pubblico)}" value="${val(p.ente_pubblico)}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small">Data prescrizione</label>
+            <input type="date" name="data_autorizzazione" class="form-control form-control-sm ${classe(p.data_autorizzazione)}" value="${val(p.data_autorizzazione)}">
+          </div>
+        </div>
+
+        ${d.note_aggiuntive ? `<div class="alert alert-light border small"><b>Note AI:</b> ${d.note_aggiuntive}</div>` : ''}
+
+        <div class="d-flex gap-2 justify-content-end">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.closest('.card').remove()">
+            Scarta
+          </button>
+          <button type="submit" class="btn btn-success btn-sm px-4">
+            <i class="bi bi-check-lg me-1"></i> Salva cliente e pratica
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{
+  "_tipo": "form",
+  "_asl_filter": "Roma 2",
+  "_note": "ASL Roma 2 — Campi verificati visivamente con TEST_campi_RM2.pdf. Il campo 'n.' (numero doc) non è AcroForm: va scritto a mano. Pagina 2 (Allegato 5) da verificare.",
+  "campi": {
+    "Text1.0.0":  "cliente.cognome_nome",
+    "Text1.1.0":  "cliente.luogo_nascita",
+    "Text1.2.0":  "cliente.data_nascita",
+    "Text1.3.0":  "cliente.indirizzo",
+    "Text1.4.0":  "cliente.citta",
+    "Text1.6.0":  "pratica.ausilio_richiesto",
+    "Text1.5.0":  "",
+    "Text1.7.0":  "data_oggi",
+    "Text1.8.0":  "cliente.doc_tipo_numero",
+    "Text1.9.0":  "cliente.citta",
+    "Text1.10.0": "cliente.doc_rilascio",
+    "Text1.11.0": "cliente.tutore_doc_tipo",
+    "Text1.12.0": "cliente.tutore_luogo_nascita",
+    "Text1.13.0": "cliente.tutore_doc_rilascio",
+
+    "Text3":      "cliente.codice_fiscale",
+    "Text4":      "cliente.telefono",
+    "Text5":      "pratica.medico_prescrittore",
+    "Text6":      "pratica.data_autorizzazione",
+
+    "Text2.9.0":  "cliente.anno_residenza",
+    "Text2.11.0": ""
+  }
+}

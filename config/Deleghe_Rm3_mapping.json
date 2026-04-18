@@ -1,0 +1,43 @@
+{
+  "_tipo": "overlay",
+  "_note": "Deleghe Rm3.pdf — ASL Roma 3. Tutte le coordinate sono state verificate con trova_coordinate.html. I campi marcati 'stimato' seguono la spaziatura della sezione delegante.",
+  "campi": [
+
+    { "pagina": 0, "x": 100, "y": 753, "chiave_dati": "asl_competente",                   "font_size": 10, "_desc": "ASL in testa pagina [stimato, verificare]" },
+    { "pagina": 0, "x": 126, "y": 699, "chiave_dati": "cliente.cognome_nome",            "font_size": 10, "_desc": "Sottoscritto cognome+nome [verificato]" },
+    { "pagina": 0, "x": 361, "y": 699, "chiave_dati": "cliente.codice_fiscale",           "font_size": 10, "_desc": "Codice Fiscale [verificato]" },
+    { "pagina": 0, "x": 170, "y": 676, "chiave_dati": "cliente.telefono",                 "font_size": 10, "_desc": "Telefono/email [verificato]" },
+    { "pagina": 0, "x":  99, "y": 644, "chiave_dati": "pratica.medico_prescrittore",      "font_size": 10, "_desc": "Medico e struttura [verificato]" },
+    { "pagina": 0, "x": 449, "y": 645, "chiave_dati": "pratica.data_autorizzazione",      "font_size": 10, "_desc": "In data prescrizione [verificato]" },
+    { "pagina": 0, "x": 115, "y": 588, "chiave_dati": "cliente.nascita_gg",               "font_size": 10, "_desc": "Nato il — giorno [verificato]" },
+    { "pagina": 0, "x": 148, "y": 588, "chiave_dati": "cliente.nascita_mm",               "font_size": 10, "_desc": "Nato il — mese [stimato]" },
+    { "pagina": 0, "x": 173, "y": 588, "chiave_dati": "cliente.nascita_aaaa",             "font_size": 10, "_desc": "Nato il — anno [stimato]" },
+    { "pagina": 0, "x": 215, "y": 588, "chiave_dati": "cliente.luogo_nascita",            "font_size": 10, "_desc": "Luogo nascita [stimato]" },
+    { "pagina": 0, "x": 177, "y": 564, "chiave_dati": "cliente.indirizzo",                "font_size": 10, "_desc": "Via/P.zza residenza [verificato]" },
+    { "pagina": 0, "x": 411, "y": 565, "chiave_dati": "cliente.citta",                    "font_size": 10, "_desc": "Città residenza [verificato]" },
+    { "pagina": 0, "x": 380, "y": 541, "chiave_dati": "cliente.anno_residenza",           "font_size": 10, "_desc": "A far data dal — anno residenza [stimato, verificare]" },
+    { "pagina": 0, "x": 127, "y": 177, "chiave_dati": "data_oggi",                        "font_size": 10, "_desc": "Luogo e Data firma [verificato]" },
+
+    { "pagina": 1, "x": 162, "y": 661, "chiave_dati": "cliente.cognome_nome",             "font_size": 10, "_desc": "Delegante: cognome nome [verificato]" },
+    { "pagina": 1, "x": 103, "y": 629, "chiave_dati": "cliente.luogo_nascita",            "font_size": 10, "_desc": "Delegante: nato a [verificato]" },
+    { "pagina": 1, "x": 311, "y": 630, "chiave_dati": "cliente.provincia",                "font_size": 10, "_desc": "Delegante: prov. [verificato]" },
+    { "pagina": 1, "x": 380, "y": 631, "chiave_dati": "cliente.data_nascita",             "font_size": 10, "_desc": "Delegante: data nascita [verificato]" },
+    { "pagina": 1, "x": 125, "y": 614, "chiave_dati": "cliente.citta",                    "font_size": 10, "_desc": "Delegante: residente a [verificato]" },
+    { "pagina": 1, "x": 263, "y": 613, "chiave_dati": "cliente.indirizzo",                "font_size": 10, "_desc": "Delegante: Via/Piazza [verificato]" },
+    { "pagina": 1, "x": 238, "y": 596, "chiave_dati": "cliente.doc_tipo",                 "font_size": 10, "_desc": "Delegante: tipo documento [verificato]" },
+    { "pagina": 1, "x": 324, "y": 596, "chiave_dati": "cliente.doc_numero",               "font_size": 10, "_desc": "Delegante: n. documento [verificato]" },
+    { "pagina": 1, "x": 474, "y": 597, "chiave_dati": "cliente.doc_rilascio",             "font_size": 10, "_desc": "Delegante: rilasciato il [verificato]" },
+
+    { "pagina": 1, "x": 136, "y": 533, "chiave_dati": "nome_azienda",                     "font_size": 10, "_desc": "Delegato: SAPIO LIFE SRL [fisso]" },
+    { "pagina": 1, "x": 103, "y": 510, "chiave_dati": "cliente.tutore_luogo_nascita",     "font_size": 10, "_desc": "Delegato: nato a [stimato]" },
+    { "pagina": 1, "x": 311, "y": 510, "chiave_dati": "cliente.tutore_provincia_nascita", "font_size": 10, "_desc": "Delegato: prov. [stimato]" },
+    { "pagina": 1, "x": 380, "y": 510, "chiave_dati": "cliente.tutore_data_nascita",      "font_size": 10, "_desc": "Delegato: data nascita [stimato]" },
+    { "pagina": 1, "x": 238, "y": 490, "chiave_dati": "cliente.tutore_doc_tipo",          "font_size": 10, "_desc": "Delegato: tipo documento [stimato]" },
+    { "pagina": 1, "x": 324, "y": 490, "chiave_dati": "cliente.tutore_doc_numero",        "font_size": 10, "_desc": "Delegato: n. documento [stimato]" },
+    { "pagina": 1, "x": 474, "y": 490, "chiave_dati": "cliente.tutore_doc_rilascio",      "font_size": 10, "_desc": "Delegato: rilasciato il [stimato]" },
+    { "pagina": 1, "x": 238, "y": 468, "chiave_dati": "pratica.ausilio_richiesto",        "font_size": 10, "_desc": "A richiedere per conto [stimato]" },
+
+    { "pagina": 1, "x": 144, "y": 420, "chiave_dati": "data_oggi",                        "font_size": 10, "_desc": "Roma lì — firma 1 [verificato]" },
+    { "pagina": 1, "x": 110, "y": 289, "chiave_dati": "data_oggi",                        "font_size": 10, "_desc": "Roma lì — firma 2 privacy [verificato]" }
+  ]
+}
