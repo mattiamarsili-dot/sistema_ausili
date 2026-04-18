@@ -4,6 +4,9 @@ from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "database.db")
 
+# Crea la cartella data/ se non esiste (necessario su Railway)
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -23,14 +26,6 @@ def _add_column_if_missing(conn, table, column, col_type):
 def init_db():
     conn = get_db()
     c = conn.cursor()
-
-    # Migrazioni sicure
-    _add_column_if_missing(conn, "pratiche", "data_segnalazione", "TEXT")
-    _add_column_if_missing(conn, "pratiche", "data_valutazione",  "TEXT")
-    _add_column_if_missing(conn, "pratiche", "data_prescrizione",  "TEXT")
-    _add_column_if_missing(conn, "pratiche", "data_ordine",        "TEXT")
-    _add_column_if_missing(conn, "clienti",  "centro",             "TEXT")
-    _add_column_if_missing(conn, "clienti",  "anno_residenza",     "TEXT")
 
     c.executescript("""
         CREATE TABLE IF NOT EXISTS clienti (
@@ -153,6 +148,15 @@ def init_db():
         );
     """)
     conn.commit()
+
+    # Migrazioni sicure — eseguite DOPO la creazione delle tabelle
+    _add_column_if_missing(conn, "pratiche", "data_segnalazione", "TEXT")
+    _add_column_if_missing(conn, "pratiche", "data_valutazione",  "TEXT")
+    _add_column_if_missing(conn, "pratiche", "data_prescrizione", "TEXT")
+    _add_column_if_missing(conn, "pratiche", "data_ordine",       "TEXT")
+    _add_column_if_missing(conn, "clienti",  "centro",            "TEXT")
+    _add_column_if_missing(conn, "clienti",  "anno_residenza",    "TEXT")
+
     conn.close()
 
 
