@@ -181,6 +181,15 @@ def modifica_template(id):
     return render_template("template_form.html", template=tmpl, campi=campi, title="Configura Template")
 
 
+@app.route("/templates/<int:id>/preview")
+def template_preview(id):
+    """Serve il PDF template per l'anteprima inline."""
+    tmpl = db.get_template(id)
+    if not tmpl or not os.path.isfile(tmpl["file_path"]):
+        return "File non trovato", 404
+    return send_file(tmpl["file_path"], mimetype="application/pdf")
+
+
 # ── COMPILAZIONE PDF ─────────────────────────────────────────────────────────
 
 @app.route("/compila/<int:template_id>/<int:pratica_id>")
