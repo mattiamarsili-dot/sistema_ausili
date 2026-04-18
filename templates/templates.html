@@ -38,11 +38,17 @@
     </div>
     <div class="card-footer bg-white d-flex gap-2">
       <a href="{{ url_for('modifica_template', id=t.id) }}" class="btn btn-sm btn-outline-primary">
-        <i class="bi bi-gear me-1"></i> Configura mappatura
+        <i class="bi bi-gear me-1"></i> Configura
       </a>
-      <a href="{{ url_for('api_inspect', template_id=t.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">
-        <i class="bi bi-search me-1"></i> Ispeziona
+      <a href="{{ url_for('template_preview', id=t.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+        <i class="bi bi-eye me-1"></i> Anteprima
       </a>
+      <form method="post" action="{{ url_for('elimina_template', id=t.id) }}" class="ms-auto"
+            onsubmit="return confirm('Eliminare il template «{{ t.nome_template }}»?\nIl file PDF verrà rimosso definitivamente.')">
+        <button class="btn btn-sm btn-outline-danger">
+          <i class="bi bi-trash"></i>
+        </button>
+      </form>
     </div>
   </div>
 </div>

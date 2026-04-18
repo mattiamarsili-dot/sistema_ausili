@@ -374,6 +374,13 @@ def save_template(data, id=None):
     return id
 
 
+def elimina_template(id):
+    conn = get_db()
+    conn.execute("DELETE FROM pdf_template_mapping WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+
+
 def log_documento(data):
     conn = get_db()
     fields = ["pratica_id","cliente_id","preventivo_id","template_id","nome_file","file_path","note"]

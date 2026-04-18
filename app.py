@@ -194,6 +194,24 @@ def template_preview(id):
     return send_file(tmpl["file_path"], mimetype="application/pdf")
 
 
+@app.route("/templates/<int:id>/elimina", methods=["POST"])
+def elimina_template(id):
+    tmpl = db.get_template(id)
+    if tmpl:
+        # Elimina il file PDF fisico
+        try:
+            if os.path.isfile(tmpl["file_path"]):
+                os.remove(tmpl["file_path"])
+        except Exception:
+            pass
+        # Elimina dal DB
+        db.elimina_template(id)
+        flash(f"Template '{tmpl['nome_template']}' eliminato.", "success")
+    else:
+        flash("Template non trovato.", "danger")
+    return redirect(url_for("templates"))
+
+
 def _carica_chiavi():
     """Restituisce lista chiavi DB + custom per la UI di configurazione template."""
     CHIAVI_PATH = os.path.join(os.path.dirname(__file__), "config", "chiavi_custom.json")
