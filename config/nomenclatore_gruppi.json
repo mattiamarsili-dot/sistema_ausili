@@ -1,0 +1,73 @@
+{
+  "gruppi": [
+    {
+      "id": "leggera",
+      "nome": "Carrozzina Leggera / Super Leggera",
+      "ausilio_types": ["Leggera", "Super leggera"],
+      "voci": [
+        {"codice_iso": "18.09.03.003", "descrizione": "Carrozzina manuale pieghevole a telaio rigido", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "basculante",
+      "nome": "Carrozzina Basculante Posturale",
+      "ausilio_types": ["Basculante Posturale", "Bascula su Misura"],
+      "voci": [
+        {"codice_iso": "18.09.06.003", "descrizione": "Carrozzina basculante su misura con sistemi posturali", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.12.006", "descrizione": "Sistema di contenimento laterale torace", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.12.012", "descrizione": "Poggiatesta regolabile", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "elettrica",
+      "nome": "Carrozzina Elettrica (Sedia WX / Moveon)",
+      "ausilio_types": ["Sedia WX", "Moveon", "Elettronica"],
+      "voci": [
+        {"codice_iso": "18.09.09.003", "descrizione": "Carrozzina elettrica con comandi elettronici", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "deambulatore",
+      "nome": "Deambulatore",
+      "ausilio_types": ["Deambulatore"],
+      "voci": [
+        {"codice_iso": "18.06.06.003", "descrizione": "Deambulatore fisso ad anello", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "materasso",
+      "nome": "Materasso Antidecubito",
+      "ausilio_types": ["Materasso"],
+      "voci": [
+        {"codice_iso": "04.33.06.006", "descrizione": "Materasso antidecubito a pressione alternata", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "montascale",
+      "nome": "Montascale",
+      "ausilio_types": ["Montascale"],
+      "voci": [
+        {"codice_iso": "18.36.03.003", "descrizione": "Montascale a cingoli", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "postura_pediatrica",
+      "nome": "Postura Pediatrica / Passeggino",
+      "ausilio_types": ["Postura Pediatrica", "Passeggino posturale"],
+      "voci": [
+        {"codice_iso": "18.09.06.006", "descrizione": "Carrozzino posturale per bambini", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito pediatrico", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "statica",
+      "nome": "Carrozzina Statica / Propulsore",
+      "ausilio_types": ["Statica", "Propulsore", "Sectional Body"],
+      "voci": [
+        {"codice_iso": "18.09.03.006", "descrizione": "Carrozzina manuale standard", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    }
+  ]
+}

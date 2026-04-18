@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Nomenclatore - Gestione Ausili{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-list-ol me-2 text-primary"></i>Nomenclatore</h1>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuova">
+    <i class="bi bi-plus-circle me-1"></i> Aggiungi voce
+  </button>
+</div>
+
+<form method="get" class="mb-3 d-flex gap-2">
+  <input type="text" name="q" class="form-control" placeholder="Cerca codice o descrizione…" value="{{ search }}">
+  <button class="btn btn-outline-secondary">Cerca</button>
+  {% if search %}<a href="{{ url_for('nomenclatore') }}" class="btn btn-outline-danger">✕</a>{% endif %}
+</form>
+
+<div class="table-responsive">
+  <table class="table table-hover table-sm align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Codice ISO</th>
+        <th>Descrizione</th>
+        <th class="text-end">Prezzo Unit.</th>
+        <th class="text-center">IVA %</th>
+        <th>Nota</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in voci %}
+      <tr>
+        <td><code>{{ v.codice_iso or '—' }}</code></td>
+        <td>{{ v.descrizione }}</td>
+        <td class="text-end">{{ '€ {:,.2f}'.format(v.prezzo_unitario or 0).replace(',','X').replace('.',',').replace('X','.') if v.prezzo_unitario else '—' }}</td>
+        <td class="text-center">{{ v.iva_perc or 4 }}%</td>
+        <td class="text-muted small">{{ v.nota or '' }}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary" onclick="editVoce({{ v | tojson }})">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <form method="post" action="{{ url_for('nomenclatore_elimina', id=v.id) }}" class="d-inline"
+                onsubmit="return confirm('Rimuovere questa voce?')">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">Nessuna voce. Aggiungi le prime voci del nomenclatore.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal nuova/modifica voce -->
+<div class="modal fade" id="modalNuova" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('nomenclatore_salva') }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitolo">Nuova voce nomenclatore</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="id" id="voceId">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Codice ISO / Nomenclatore</label>
+            <input type="text" name="codice_iso" id="voceCodice" class="form-control font-monospace" placeholder="es. 18.09.03.003">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Descrizione *</label>
+            <input type="text" name="descrizione" id="voceDescrizione" class="form-control" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-7">
+              <label class="form-label fw-semibold">Prezzo unitario (€)</label>
+              <input type="number" name="prezzo_unitario" id="vocePrezzo" class="form-control" step="0.01" min="0" value="0">
+            </div>
+            <div class="col-5">
+              <label class="form-label fw-semibold">IVA %</label>
+              <input type="number" name="iva_perc" id="voceIva" class="form-control" step="0.1" value="4">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label fw-semibold">Nota</label>
+            <input type="text" name="nota" id="voceNota" class="form-control" placeholder="Facoltativa">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+          <button type="submit" class="btn btn-primary">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function editVoce(v) {
+  document.getElementById('modalTitolo').textContent = 'Modifica voce';
+  document.getElementById('voceId').value = v.id;
+  document.getElementById('voceCodice').value = v.codice_iso || '';
+  document.getElementById('voceDescrizione').value = v.descrizione || '';
+  document.getElementById('vocePrezzo').value = v.prezzo_unitario || 0;
+  document.getElementById('voceIva').value = v.iva_perc || 4;
+  document.getElementById('voceNota').value = v.nota || '';
+  new bootstrap.Modal(document.getElementById('modalNuova')).show();
+}
+</script>
+{% endblock %}

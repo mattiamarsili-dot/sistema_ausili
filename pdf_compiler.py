@@ -94,6 +94,9 @@ def _arricchisci_dati(dati: dict) -> dict:
                 pass
         dati["pratica"] = p
 
+    # Data di oggi formattata
+    dati["data_oggi"] = datetime.now().strftime("%d/%m/%Y")
+
     return dati
 
 
@@ -222,6 +225,113 @@ def compila_overlay_pdf(pdf_path: str, overlay_config: list, dati: dict, output_
 CONFIG_DIR = os.path.join(os.path.dirname(__file__), "config")
 
 
+def compila_preventivo_pdf(pdf_path: str, dati: dict, output_path: str) -> str:
+    """
+    Compila MODELLO_PREVENTIVI_2026 (PDF statico) con overlay testo + tabella voci.
+    Le coordinate sono in punti PDF (y dal basso).
+    """
+    if not HAS_PYPDF or not HAS_REPORTLAB:
+        raise RuntimeError("pypdf e reportlab richiesti")
+
+    voci = dati.get("voci", [])
+    cliente = dati.get("cliente", {})
+    pratica = dati.get("pratica", {})
+
+    # Calcola totali
+    subtotale = sum(float(v.get("prezzo_totale", 0) or 0) for v in voci)
+    iva = round(subtotale * 0.04, 2)
+    totale_lordo = round(subtotale + iva, 2)
+
+    def fmt_euro(val):
+        return f"€ {val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+    reader = PdfReader(pdf_path)
+    writer = PdfWriter()
+    page = reader.pages[0]
+    page_width = float(page.mediabox.width)
+    page_height = float(page.mediabox.height)
+
+    packet = io.BytesIO()
+    c = canvas.Canvas(packet, pagesize=(page_width, page_height))
+    c.setFont("Helvetica", 9)
+    c.setFillColorRGB(0, 0, 0)
+
+    # ── Dati paziente ──────────────────────────────────────────────
+    cognome_nome = f"{cliente.get('cognome','').strip()} {cliente.get('nome','').strip()}".strip()
+    c.drawString(130, 648.7, cognome_nome)
+
+    luogo_nascita = cliente.get("luogo_nascita", "")
+    c.drawString(393, 648.7, luogo_nascita)
+
+    indirizzo = f"{cliente.get('indirizzo','')} {cliente.get('citta','')}".strip()
+    c.drawString(145, 625.9, indirizzo)
+
+    # Data nascita formattata
+    dn = cliente.get("data_nascita", "")
+    if dn and len(dn) >= 10:
+        try:
+            d = datetime.strptime(dn[:10], "%Y-%m-%d")
+            dn_fmt = d.strftime("%d/%m/%Y")
+        except Exception:
+            dn_fmt = dn
+    else:
+        dn_fmt = dn
+    c.drawString(335, 625.9, dn_fmt)
+
+    telefono = cliente.get("telefono", "")
+    c.drawString(120, 603.2, telefono)
+
+    centro = pratica.get("centro", "")
+    c.drawString(395, 603.2, centro)
+
+    # Numero pratica come riferimento
+    num_pratica = pratica.get("numero_pratica", "")
+    codice_am = pratica.get("codice_am", "")
+    rif = codice_am if codice_am else num_pratica
+    c.drawString(135, 678.2, rif)
+
+    # ── Tabella voci ───────────────────────────────────────────────
+    c.setFont("Helvetica", 9)
+    y_start = 362.0
+    row_h = 17.0
+    max_righe = 12  # sicurezza: non andare oltre i totali
+
+    for i, v in enumerate(voci[:max_righe]):
+        y = y_start - i * row_h
+        codice = str(v.get("codice_iso", "") or "")
+        desc = str(v.get("descrizione", "") or "")
+        qty = v.get("quantita", 1)
+        p_u = float(v.get("prezzo_unitario", 0) or 0)
+        p_t = float(v.get("prezzo_totale", 0) or 0)
+
+        c.drawString(16, y, codice[:14])
+        # Tronca descrizione se troppo lunga (~50 chars per adattarsi alla colonna)
+        if len(desc) > 52:
+            desc = desc[:50] + "…"
+        c.drawString(99, y, desc)
+        c.drawRightString(375, y, str(qty).rstrip("0").rstrip(".") if "." in str(qty) else str(qty))
+        c.drawRightString(453, y, fmt_euro(p_u) if p_u else "")
+        c.drawRightString(512, y, fmt_euro(p_t) if p_t else "")
+
+    # ── Totali ─────────────────────────────────────────────────────
+    c.setFont("Helvetica-Bold", 9)
+    c.drawRightString(512, 110.2, fmt_euro(subtotale))
+    c.drawRightString(512, 94.2, fmt_euro(iva))
+    c.drawRightString(512, 78.1, fmt_euro(totale_lordo))
+
+    c.save()
+    packet.seek(0)
+
+    overlay_reader = PdfReader(packet)
+    page.merge_page(overlay_reader.pages[0])
+    writer.add_page(page)
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    with open(output_path, "wb") as f:
+        writer.write(f)
+    return output_path
+
+
 def _carica_mappatura(template_record: dict) -> dict:
     """
     Cerca la mappatura in ordine:
@@ -261,6 +371,9 @@ def compila_pdf(template_record: dict, dati: dict) -> str:
     cliente_cf = dati.get("cliente", {}).get("codice_fiscale", "SCONOSCIUTO")
     nome_out = f"{template_record['nome_template']}_{cliente_cf}_{timestamp}.pdf"
     output_path = os.path.join(OUTPUT_DIR, nome_out)
+
+    if tipo == "preventivo_tabella":
+        return compila_preventivo_pdf(pdf_path, dati, output_path)
 
     if tipo == "overlay":
         # Filtra solo i campi reali (ignora chiavi con _ come _desc, _note)

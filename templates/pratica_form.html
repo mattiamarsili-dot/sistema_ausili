@@ -263,6 +263,185 @@
 </div>
 </form>
 
+<!-- ── SEZIONE VOCI NOMENCLATORE ─────────────────────────────────────── -->
+{% if pratica.id %}
+<div class="card mt-4" id="card-voci">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Voci Nomenclatore / Preventivo</h5>
+    <div class="d-flex gap-2 align-items-center">
+      <select id="selGruppo" class="form-select form-select-sm" style="max-width:260px">
+        <option value="">— Carica preset per ausilio —</option>
+      </select>
+      <button type="button" class="btn btn-sm btn-outline-primary" onclick="caricaGruppo()">Carica</button>
+      <button type="button" class="btn btn-sm btn-outline-success" onclick="aggiungiRiga()">
+        <i class="bi bi-plus"></i> Riga
+      </button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0" id="tblVoci">
+        <thead class="table-light">
+          <tr>
+            <th style="width:130px">Codice ISO</th>
+            <th>Descrizione</th>
+            <th style="width:70px" class="text-center">Q.tà</th>
+            <th style="width:110px" class="text-end">Prezzo Unit. €</th>
+            <th style="width:110px" class="text-end">Totale €</th>
+            <th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody id="righeVoci">
+          <!-- righe generate da JS -->
+        </tbody>
+        <tfoot class="table-light fw-semibold">
+          <tr>
+            <td colspan="4" class="text-end">Totale imponibile:</td>
+            <td class="text-end" id="totImponibile">€ 0,00</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-end">IVA 4%:</td>
+            <td class="text-end" id="totIva">€ 0,00</td>
+            <td></td>
+          </tr>
+          <tr class="table-primary">
+            <td colspan="4" class="text-end">Totale lordo:</td>
+            <td class="text-end" id="totLordo">€ 0,00</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <span class="text-muted small" id="statoSalvataggio">Non salvato</span>
+    <button type="button" class="btn btn-success" onclick="salvaVoci()">
+      <i class="bi bi-floppy me-1"></i> Salva voci
+    </button>
+  </div>
+</div>
+
+<script>
+const PRATICA_ID = {{ pratica.id }};
+const AUSILIO_TYPE = {{ (pratica.ausilio_richiesto or '') | tojson }};
+let tuttiGruppi = [];
+
+// ── Carica gruppi ──
+fetch('/api/nomenclatore/gruppi')
+  .then(r => r.json())
+  .then(data => {
+    tuttiGruppi = data.gruppi || [];
+    const sel = document.getElementById('selGruppo');
+    tuttiGruppi.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.nome;
+      // Evidenzia il gruppo corrispondente al tipo di ausilio
+      if (AUSILIO_TYPE && g.ausilio_types && g.ausilio_types.includes(AUSILIO_TYPE)) {
+        opt.selected = true;
+        opt.textContent = '★ ' + g.nome;
+      }
+      sel.appendChild(opt);
+    });
+  });
+
+// ── Carica voci salvate ──
+fetch(`/api/pratica/${PRATICA_ID}/voci`)
+  .then(r => r.json())
+  .then(voci => {
+    voci.forEach(v => aggiungiRiga(v));
+    ricalcola();
+  });
+
+function caricaGruppo() {
+  const gid = document.getElementById('selGruppo').value;
+  if (!gid) return;
+  const gruppo = tuttiGruppi.find(g => g.id === gid);
+  if (!gruppo) return;
+  if (document.getElementById('righeVoci').children.length > 0) {
+    if (!confirm('Vuoi aggiungere le voci del gruppo alle righe esistenti?\n(Clicca Annulla per sostituire)')) {
+      document.getElementById('righeVoci').innerHTML = '';
+    }
+  }
+  gruppo.voci.forEach(v => aggiungiRiga(v));
+  ricalcola();
+}
+
+let rigaIndex = 0;
+function aggiungiRiga(v = {}) {
+  const i = rigaIndex++;
+  const tbody = document.getElementById('righeVoci');
+  const tr = document.createElement('tr');
+  tr.dataset.idx = i;
+  tr.innerHTML = `
+    <td><input type="text" class="form-control form-control-sm font-monospace" value="${esc(v.codice_iso||'')}" onchange="ricalcola()" placeholder="18.xx.xx.xxx" oninput="ricalcola()"></td>
+    <td><input type="text" class="form-control form-control-sm" value="${esc(v.descrizione||'')}" onchange="ricalcola()"></td>
+    <td><input type="number" class="form-control form-control-sm text-center qty" value="${v.quantita||1}" min="0.1" step="0.01" oninput="ricalcola()"></td>
+    <td><input type="number" class="form-control form-control-sm text-end prezzoU" value="${v.prezzo_unitario||0}" min="0" step="0.01" oninput="ricalcola()"></td>
+    <td class="text-end align-middle prezzoT fw-semibold">€ 0,00</td>
+    <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger p-0 px-1" onclick="this.closest('tr').remove(); ricalcola()"><i class="bi bi-x"></i></button></td>
+  `;
+  tbody.appendChild(tr);
+  ricalcola();
+}
+
+function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function fmtEuro(n) {
+  return '€ ' + n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function ricalcola() {
+  let sub = 0;
+  document.querySelectorAll('#righeVoci tr').forEach(tr => {
+    const qty = parseFloat(tr.querySelector('.qty')?.value) || 0;
+    const pu  = parseFloat(tr.querySelector('.prezzoU')?.value) || 0;
+    const tot = Math.round(qty * pu * 100) / 100;
+    const cell = tr.querySelector('.prezzoT');
+    if (cell) cell.textContent = fmtEuro(tot);
+    sub += tot;
+  });
+  const iva = Math.round(sub * 4) / 100;
+  const lordo = sub + iva;
+  document.getElementById('totImponibile').textContent = fmtEuro(sub);
+  document.getElementById('totIva').textContent = fmtEuro(iva);
+  document.getElementById('totLordo').textContent = fmtEuro(lordo);
+  document.getElementById('statoSalvataggio').textContent = 'Non salvato';
+  document.getElementById('statoSalvataggio').className = 'text-muted small';
+}
+
+function salvaVoci() {
+  const voci = [];
+  document.querySelectorAll('#righeVoci tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const codice = inputs[0]?.value.trim();
+    const desc = inputs[1]?.value.trim();
+    if (!codice && !desc) return;
+    const qty = parseFloat(inputs[2]?.value) || 1;
+    const pu  = parseFloat(inputs[3]?.value) || 0;
+    voci.push({ codice_iso: codice, descrizione: desc, quantita: qty, prezzo_unitario: pu, prezzo_totale: Math.round(qty*pu*100)/100 });
+  });
+
+  fetch(`/api/pratica/${PRATICA_ID}/voci`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({voci})
+  })
+  .then(r => r.json())
+  .then(data => {
+    const st = document.getElementById('statoSalvataggio');
+    st.textContent = `✓ Salvate ${data.n} voci`;
+    st.className = 'text-success small fw-semibold';
+  })
+  .catch(() => {
+    document.getElementById('statoSalvataggio').textContent = '✗ Errore salvataggio';
+    document.getElementById('statoSalvataggio').className = 'text-danger small';
+  });
+}
+</script>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}

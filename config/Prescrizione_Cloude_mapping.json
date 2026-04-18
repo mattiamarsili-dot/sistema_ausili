@@ -1,0 +1,17 @@
+{
+  "_tipo": "form",
+  "campi": {
+    "field0_1": "cliente.cognome",
+    "field1_1": "cliente.nome",
+    "field2_1": "cliente.nascita_gg",
+    "field3_1": "cliente.nascita_mm",
+    "field4_1": "cliente.nascita_aaaa",
+    "field5_1": "cliente.luogo_nascita",
+    "field6_1": "cliente.indirizzo",
+    "field8_1": "cliente.citta",
+    "field9_1": "cliente.provincia",
+    "field10_1": "cliente.codice_fiscale",
+    "field11_1": "cliente.telefono",
+    "field12_1": "pratica.descrizione_ausilio"
+  }
+}

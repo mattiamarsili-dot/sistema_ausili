@@ -313,9 +313,11 @@ def compila_pdf(template_id, pratica_id):
     if not tmpl:
         return jsonify({"errore": "Template non trovato"}), 404
 
+    voci = db.get_pratica_voci(pratica_id)
     dati = {
         "cliente": cliente,
         "pratica": pratica,
+        "voci": voci,
         "data_oggi": __import__("datetime").date.today().strftime("%d/%m/%Y")
     }
 
@@ -332,6 +334,56 @@ def compila_pdf(template_id, pratica_id):
     except Exception as e:
         flash(f"Errore nella compilazione: {e}", "danger")
         return redirect(url_for("modifica_pratica", id=pratica_id))
+
+
+# ── API VOCI PRATICA ──────────────────────────────────────────────────────────
+
+@app.route("/api/pratica/<int:id>/voci")
+def api_get_voci(id):
+    voci = db.get_pratica_voci(id)
+    return jsonify(voci)
+
+
+@app.route("/api/pratica/<int:id>/voci", methods=["POST"])
+def api_save_voci(id):
+    data = request.get_json()
+    voci = data.get("voci", [])
+    db.save_pratica_voci(id, voci)
+    return jsonify({"ok": True, "n": len(voci)})
+
+
+@app.route("/api/nomenclatore/gruppi")
+def api_nomenclatore_gruppi():
+    gruppi_path = os.path.join(os.path.dirname(__file__), "config", "nomenclatore_gruppi.json")
+    if os.path.isfile(gruppi_path):
+        with open(gruppi_path) as f:
+            return jsonify(json.load(f))
+    return jsonify({"gruppi": []})
+
+
+# ── NOMENCLATORE CATALOG ──────────────────────────────────────────────────────
+
+@app.route("/nomenclatore")
+def nomenclatore():
+    search = request.args.get("q", "")
+    lista = db.get_all_nomenclatore(search=search or None)
+    return render_template("nomenclatore.html", voci=lista, search=search)
+
+
+@app.route("/nomenclatore/salva", methods=["POST"])
+def nomenclatore_salva():
+    data = request.form.to_dict()
+    vid = data.pop("id", None)
+    db.save_nomenclatore_voce(data, id=int(vid) if vid else None)
+    flash("Voce salvata.", "success")
+    return redirect(url_for("nomenclatore"))
+
+
+@app.route("/nomenclatore/<int:id>/elimina", methods=["POST"])
+def nomenclatore_elimina(id):
+    db.delete_nomenclatore_voce(id)
+    flash("Voce rimossa.", "warning")
+    return redirect(url_for("nomenclatore"))
 
 
 @app.route("/api/inspect/<int:template_id>")

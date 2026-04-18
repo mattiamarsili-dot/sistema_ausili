@@ -159,6 +159,9 @@
   <a href="{{ url_for('templates') }}" class="nav-link {% if request.endpoint in ['templates','nuovo_template','modifica_template'] %}active{% endif %}">
     <i class="bi bi-file-earmark-pdf"></i> Template PDF
   </a>
+  <a href="{{ url_for('nomenclatore') }}" class="nav-link {% if request.endpoint in ['nomenclatore','nomenclatore_salva','nomenclatore_elimina'] %}active{% endif %}">
+    <i class="bi bi-list-ol"></i> Nomenclatore
+  </a>
   <a href="{{ url_for('gestisci_chiavi') }}" class="nav-link {% if request.endpoint == 'gestisci_chiavi' %}active{% endif %}">
     <i class="bi bi-key"></i> Chiavi Dati
   </a>
@@ -184,6 +187,9 @@
   </a>
   <a href="{{ url_for('templates') }}" class="{% if 'template' in request.endpoint %}active{% endif %}">
     <i class="bi bi-file-earmark-pdf"></i>PDF
+  </a>
+  <a href="{{ url_for('nomenclatore') }}" class="{% if 'nomenclatore' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-list-ol"></i>Nomenclatore
   </a>
   <a href="{{ url_for('drive') }}"    class="{% if 'drive' in request.endpoint %}active{% endif %}">
     <i class="bi bi-google"></i>Drive

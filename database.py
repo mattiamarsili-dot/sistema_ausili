@@ -146,6 +146,27 @@ def init_db():
             data_generazione TEXT DEFAULT (datetime('now','localtime')),
             note TEXT
         );
+
+        CREATE TABLE IF NOT EXISTS nomenclatore_voci (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            codice_iso TEXT,
+            descrizione TEXT NOT NULL,
+            prezzo_unitario REAL DEFAULT 0,
+            iva_perc REAL DEFAULT 4,
+            nota TEXT,
+            attivo INTEGER DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS pratica_voci (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pratica_id INTEGER NOT NULL REFERENCES pratiche(id) ON DELETE CASCADE,
+            codice_iso TEXT,
+            descrizione TEXT,
+            quantita REAL DEFAULT 1,
+            prezzo_unitario REAL DEFAULT 0,
+            prezzo_totale REAL DEFAULT 0,
+            ordinamento INTEGER DEFAULT 0
+        );
     """)
     conn.commit()
 
@@ -386,6 +407,68 @@ def log_documento(data):
     fields = ["pratica_id","cliente_id","preventivo_id","template_id","nome_file","file_path","note"]
     values = [data.get(f) for f in fields]
     conn.execute(f"INSERT INTO documenti_generati ({','.join(fields)}) VALUES ({','.join('?'*len(fields))})", values)
+    conn.commit()
+    conn.close()
+
+
+# ── NOMENCLATORE ──────────────────────────────────────────────────────────────
+
+def get_all_nomenclatore(search=None):
+    conn = get_db()
+    if search:
+        q = f"%{search}%"
+        rows = conn.execute(
+            "SELECT * FROM nomenclatore_voci WHERE attivo=1 AND (codice_iso LIKE ? OR descrizione LIKE ?)",
+            (q, q)).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM nomenclatore_voci WHERE attivo=1 ORDER BY codice_iso, descrizione").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def save_nomenclatore_voce(data, id=None):
+    conn = get_db()
+    fields = ["codice_iso", "descrizione", "prezzo_unitario", "iva_perc", "nota"]
+    values = [data.get(f, "") or None for f in fields]
+    if id:
+        set_clause = ", ".join(f"{f}=?" for f in fields)
+        conn.execute(f"UPDATE nomenclatore_voci SET {set_clause} WHERE id=?", values + [id])
+    else:
+        conn.execute(f"INSERT INTO nomenclatore_voci ({','.join(fields)}) VALUES ({','.join('?'*len(fields))})", values)
+        id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    conn.commit()
+    conn.close()
+    return id
+
+
+def delete_nomenclatore_voce(id):
+    conn = get_db()
+    conn.execute("UPDATE nomenclatore_voci SET attivo=0 WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+
+
+def get_pratica_voci(pratica_id):
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM pratica_voci WHERE pratica_id=? ORDER BY ordinamento, id",
+        (pratica_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def save_pratica_voci(pratica_id, voci_list):
+    """Sostituisce tutte le voci della pratica con la lista fornita."""
+    conn = get_db()
+    conn.execute("DELETE FROM pratica_voci WHERE pratica_id=?", (pratica_id,))
+    for i, v in enumerate(voci_list):
+        qty = float(v.get("quantita", 1) or 1)
+        prezzo_u = float(v.get("prezzo_unitario", 0) or 0)
+        prezzo_t = round(qty * prezzo_u, 2)
+        conn.execute(
+            "INSERT INTO pratica_voci (pratica_id, codice_iso, descrizione, quantita, prezzo_unitario, prezzo_totale, ordinamento) VALUES (?,?,?,?,?,?,?)",
+            (pratica_id, v.get("codice_iso",""), v.get("descrizione",""), qty, prezzo_u, prezzo_t, i)
+        )
     conn.commit()
     conn.close()
 
