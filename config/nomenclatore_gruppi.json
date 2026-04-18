@@ -1,72 +1,212 @@
 {
   "gruppi": [
     {
-      "id": "leggera",
-      "nome": "Carrozzina Leggera / Super Leggera",
-      "ausilio_types": ["Leggera", "Super leggera"],
+      "id": "moveon",
+      "nome": "Moveon",
+      "ausilio_types": ["Moveon"],
       "voci": [
-        {"codice_iso": "18.09.03.003", "descrizione": "Carrozzina manuale pieghevole a telaio rigido", "quantita": 1, "prezzo_unitario": 0},
-        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "06.12.06.027", "descrizione": "Ortesi dinamica gamba piede a valva alta", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.12.15.003", "descrizione": "Ortesi di posizione per anca doccia rigida bilaterale", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.06.13.012", "descrizione": "Ortesi funzionale Avambraccio - Mano - Dita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.03.18.033", "descrizione": "Busto statico equilibrato", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.03.91.724", "descrizione": "Presa scapolo omerale: Rigida lunga", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "06.12.92.639", "descrizione": "Supporto Addominale", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.06.91.106", "descrizione": "Tenditore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "06.12.91.218", "descrizione": "Tenditore arto inferiore", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "basculante",
-      "nome": "Carrozzina Basculante Posturale",
+      "id": "superleggera_pieghevole",
+      "nome": "Superleggera Pieghevole Completa",
+      "ausilio_types": ["Super leggera"],
+      "voci": [
+        {"codice_iso": "12.22.03.012", "descrizione": "Carrozzina A Telaio Pieghevole Superleggera", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.006", "descrizione": "Modulo Posturale Per Il Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.009", "descrizione": "Modulo Posturale Per Il Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.042", "descrizione": "Cinturini Fermapiede (Coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.045", "descrizione": "Fermatallone (Coppia) Aggiuntivo Carrozzine", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.003", "descrizione": "Modulo Posturale Per Il Capo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "superleggera_rigida",
+      "nome": "Superleggera Rigida",
+      "ausilio_types": [],
+      "voci": [
+        {"codice_iso": "12.22.03.009", "descrizione": "Carrozzina A Telaio Rigido Superleggera", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.006", "descrizione": "Modulo Posturale Per Il Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.009", "descrizione": "Modulo Posturale Per Il Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.042", "descrizione": "Cinturini Fermapiede (Coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.045", "descrizione": "Fermatallone (Coppia) Aggiuntivo Carrozzine", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.003", "descrizione": "Modulo Posturale Per Il Capo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "bascula_adulti",
+      "nome": "Bascula Adulti",
       "ausilio_types": ["Basculante Posturale", "Bascula su Misura"],
       "voci": [
-        {"codice_iso": "18.09.06.003", "descrizione": "Carrozzina basculante su misura con sistemi posturali", "quantita": 1, "prezzo_unitario": 0},
-        {"codice_iso": "18.09.12.006", "descrizione": "Sistema di contenimento laterale torace", "quantita": 2, "prezzo_unitario": 0},
-        {"codice_iso": "18.09.12.012", "descrizione": "Poggiatesta regolabile", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.27.04.003", "descrizione": "Base Di Mobilità Basculante Per Sistemi Di Postura", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.021", "descrizione": "Schienale Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.024", "descrizione": "Sedile Rigido, Per Base Di Mobilità", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.030", "descrizione": "Cinghia a 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.036", "descrizione": "Appoggiatesta Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.012", "descrizione": "Modulo Posturale Per Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.015", "descrizione": "Modulo Posturale Per Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.021", "descrizione": "Modulo Posturale Per Arto Inferiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.024", "descrizione": "Modulo Posturale Per Arto Superiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.90.948", "descrizione": "Assemblaggio Base Di Mobilità Basculante", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.039", "descrizione": "Appoggiagambe a Lat", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.027", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "elettrica",
-      "nome": "Carrozzina Elettrica (Sedia WX / Moveon)",
-      "ausilio_types": ["Sedia WX", "Moveon", "Elettronica"],
+      "id": "bascula_pediatrica",
+      "nome": "Bascula Pediatrica",
+      "ausilio_types": [],
       "voci": [
-        {"codice_iso": "18.09.09.003", "descrizione": "Carrozzina elettrica con comandi elettronici", "quantita": 1, "prezzo_unitario": 0},
-        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.27.04.006", "descrizione": "Base Di Mobilità Basculante Per Esterni (Età Evolutiva)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.021", "descrizione": "Schienale Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.024", "descrizione": "Sedile Rigido, Per Base Di Mobilità", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.030", "descrizione": "Cinghia a 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.033", "descrizione": "Cinghia a Bretellaggio", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.036", "descrizione": "Appoggiatesta Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.039", "descrizione": "Appoggiagambe a Lat", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.27.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.012", "descrizione": "Modulo Posturale Per Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.015", "descrizione": "Modulo Posturale Per Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.021", "descrizione": "Modulo Posturale Per Arto Inferiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.024", "descrizione": "Modulo Posturale Per Arto Superiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.90.948", "descrizione": "Assemblaggio Base Di Mobilità Basculante", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "deambulatore",
-      "nome": "Deambulatore",
-      "ausilio_types": ["Deambulatore"],
+      "id": "propulsione",
+      "nome": "Sistemi di Propulsione",
+      "ausilio_types": ["Propulsore"],
       "voci": [
-        {"codice_iso": "18.06.06.003", "descrizione": "Deambulatore fisso ad anello", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.24.09.006", "descrizione": "Sistema Ausiliario Di Propulsione Con Sostituzione Delle Ruote", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.24.09.006/B", "descrizione": "Sistema Ausiliario Di Propulsione Per Accompagnatore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.24.09.015", "descrizione": "Kit Di Motorizzazione Universale Per Carrozzine", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "materasso",
-      "nome": "Materasso Antidecubito",
-      "ausilio_types": ["Materasso"],
+      "id": "leggera",
+      "nome": "Leggera",
+      "ausilio_types": ["Leggera"],
       "voci": [
-        {"codice_iso": "04.33.06.006", "descrizione": "Materasso antidecubito a pressione alternata", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.22.03.006", "descrizione": "Carrozzina Leggera", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.006", "descrizione": "Modulo Posturale Per Il Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.009", "descrizione": "Modulo Posturale Per Il Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "montascale",
-      "nome": "Montascale",
-      "ausilio_types": ["Montascale"],
+      "id": "postura_pediatrica_interna",
+      "nome": "Postura Pediatrica (Base Interna)",
+      "ausilio_types": ["Postura Pediatrica"],
       "voci": [
-        {"codice_iso": "18.36.03.003", "descrizione": "Montascale a cingoli", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.27.04.003", "descrizione": "Base Di Mobilità Basculante Per Sistemi Di Postura", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.003", "descrizione": "Modulo Posturale Per Il Capo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.012", "descrizione": "Modulo Posturale Per Il Tronco/Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.012", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.033", "descrizione": "Appoggiatesta, Reg", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.042", "descrizione": "Cinturini Fermapiede (Coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.045", "descrizione": "Fermatallone (Coppia) Aggiuntivo Carrozzine", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "postura_pediatrica",
-      "nome": "Postura Pediatrica / Passeggino",
-      "ausilio_types": ["Postura Pediatrica", "Passeggino posturale"],
+      "id": "postura_pediatrica_esterna",
+      "nome": "Postura Pediatrica (Base Esterna Età Evolutiva)",
+      "ausilio_types": ["Passeggino posturale"],
       "voci": [
-        {"codice_iso": "18.09.06.006", "descrizione": "Carrozzino posturale per bambini", "quantita": 1, "prezzo_unitario": 0},
-        {"codice_iso": "18.09.12.003", "descrizione": "Cuscino antidecubito pediatrico", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "12.27.04.006", "descrizione": "Base Di Mobilità Basculante Per Esterni (Età Evolutiva)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.003", "descrizione": "Modulo Posturale Per Il Capo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.012", "descrizione": "Modulo Posturale Per Il Tronco/Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.012", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.033", "descrizione": "Appoggiatesta, Reg", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.042", "descrizione": "Cinturini Fermapiede (Coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.045", "descrizione": "Fermatallone (Coppia) Aggiuntivo Carrozzine", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 0}
       ]
     },
     {
-      "id": "statica",
-      "nome": "Carrozzina Statica / Propulsore",
-      "ausilio_types": ["Statica", "Propulsore", "Sectional Body"],
+      "id": "stabilizzatore",
+      "nome": "Stabilizzatore",
+      "ausilio_types": ["Statica"],
       "voci": [
-        {"codice_iso": "18.09.03.006", "descrizione": "Carrozzina manuale standard", "quantita": 1, "prezzo_unitario": 0}
+        {"codice_iso": "04.48.21.015", "descrizione": "Stabilizzatore mobile per statica eretta", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.009", "descrizione": "Regolazione della prono-supinazione", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.012", "descrizione": "Regolazione intra ed extra rotazione", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.015", "descrizione": "Regolazione della flesso-estensione", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.018", "descrizione": "Regolazione divaricazione", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.036", "descrizione": "Regolazione servoassistita con pistone", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.045", "descrizione": "Sostegni per arto superiore (coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "04.48.91.048", "descrizione": "Divaricatore di tipo stretto o largo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.012", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.042", "descrizione": "Cinturini Fermapiede (Coppia)", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.045", "descrizione": "Fermatallone (Coppia) Aggiuntivo Carrozzine", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.003", "descrizione": "Modulo Posturale Per Il Capo", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "elettronica_6ruote",
+      "nome": "Elettronica 6 Ruote",
+      "ausilio_types": ["Elettronica"],
+      "voci": [
+        {"codice_iso": "12.36.06.018", "descrizione": "Carrozzina Elettrica A Sei Ruote", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.009", "descrizione": "Basculamento Motorizzato", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.018", "descrizione": "Regolazione Servoassistita Dello Schienale", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.024", "descrizione": "Pelotte Toracali", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.033", "descrizione": "Appoggiatesta", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.006", "descrizione": "Modulo Posturale Per Il Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.009", "descrizione": "Modulo Posturale Per Il Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.012", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.021", "descrizione": "Modulo Posturale Per Arto Inferiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.024", "descrizione": "Modulo Posturale Per Arto Superiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.90.954", "descrizione": "Assemblaggio Carrozzina Elettronica", "quantita": 1, "prezzo_unitario": 0}
+      ]
+    },
+    {
+      "id": "elettronica_standard",
+      "nome": "Elettronica Standard",
+      "ausilio_types": ["Sedia WX"],
+      "voci": [
+        {"codice_iso": "12.36.06.015", "descrizione": "Carrozzina Elettrica Uso Esterno", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.009", "descrizione": "Basculamento Motorizzato", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.018", "descrizione": "Regolazione Servoassistita Dello Schienale", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.024", "descrizione": "Pelotte Toracali", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.033", "descrizione": "Appoggiatesta", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.006", "descrizione": "Modulo Posturale Per Il Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.39.009", "descrizione": "Modulo Posturale Per Il Tronco", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.003", "descrizione": "Divaricatore Imbottito Regolabile", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.006", "descrizione": "Regolazione Laterale Del Divaricatore", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.012", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.91.015", "descrizione": "Cinghia A 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.021", "descrizione": "Modulo Posturale Per Arto Inferiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.21.024", "descrizione": "Modulo Posturale Per Arto Superiore (Singolo)", "quantita": 2, "prezzo_unitario": 0},
+        {"codice_iso": "18.09.90.954", "descrizione": "Assemblaggio Carrozzina Elettronica", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.012", "descrizione": "Elevazione Motorizzata", "quantita": 1, "prezzo_unitario": 0},
+        {"codice_iso": "12.23.91.021", "descrizione": "Regolazione Motorizzata Dello Schienale", "quantita": 1, "prezzo_unitario": 0}
       ]
     }
   ]
