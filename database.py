@@ -458,17 +458,25 @@ def get_pratica_voci(pratica_id):
 
 
 def save_pratica_voci(pratica_id, voci_list):
-    """Sostituisce tutte le voci della pratica con la lista fornita."""
+    """Sostituisce tutte le voci della pratica con la lista fornita.
+    Aggiorna anche pratiche.importo_preventivo con il subtotale (netto)."""
     conn = get_db()
     conn.execute("DELETE FROM pratica_voci WHERE pratica_id=?", (pratica_id,))
+    subtotale = 0.0
     for i, v in enumerate(voci_list):
         qty = float(v.get("quantita", 1) or 1)
         prezzo_u = float(v.get("prezzo_unitario", 0) or 0)
         prezzo_t = round(qty * prezzo_u, 2)
+        subtotale += prezzo_t
         conn.execute(
             "INSERT INTO pratica_voci (pratica_id, codice_iso, descrizione, quantita, prezzo_unitario, prezzo_totale, ordinamento) VALUES (?,?,?,?,?,?,?)",
             (pratica_id, v.get("codice_iso",""), v.get("descrizione",""), qty, prezzo_u, prezzo_t, i)
         )
+    # Aggiorna importo_preventivo nella pratica con il totale netto
+    conn.execute(
+        "UPDATE pratiche SET importo_preventivo=? WHERE id=?",
+        (round(subtotale, 2), pratica_id)
+    )
     conn.commit()
     conn.close()
 
