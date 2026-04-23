@@ -198,13 +198,16 @@ def template_preview(id):
 def elimina_template(id):
     tmpl = db.get_template(id)
     if tmpl:
-        # Elimina il file PDF fisico
-        try:
-            if os.path.isfile(tmpl["file_path"]):
-                os.remove(tmpl["file_path"])
-        except Exception:
-            pass
-        # Elimina dal DB
+        # Elimina il file fisico solo se è nella cartella gestita dall'app
+        file_path = tmpl["file_path"]
+        managed_dir = os.path.join(os.path.dirname(__file__), "data", "pdf_templates")
+        abs_path = os.path.abspath(file_path)
+        if abs_path.startswith(os.path.abspath(managed_dir)):
+            try:
+                if os.path.isfile(abs_path):
+                    os.remove(abs_path)
+            except Exception:
+                pass
         db.elimina_template(id)
         flash(f"Template '{tmpl['nome_template']}' eliminato.", "success")
     else:
