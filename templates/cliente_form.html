@@ -100,12 +100,13 @@
         <div class="row g-3">
           <div class="col-md-3">
             <label class="form-label fw-semibold">ASL competente</label>
-            <select name="asl_competente" class="form-select">
-              <option value="">— Seleziona —</option>
-              {% for a in ['ASL Roma 1','ASL Roma 2','ASL Roma 3','ASL Roma 4','ASL Roma 5','ASL Roma 6'] %}
-              <option value="{{ a }}" {% if cliente.asl_competente == a %}selected{% endif %}>{{ a }}</option>
+            <input type="text" name="asl_competente" class="form-control" list="lista-asl"
+                   value="{{ cliente.asl_competente or '' }}" placeholder="es. RM1, FR…" autocomplete="off">
+            <datalist id="lista-asl">
+              {% for a in ['RM1','RM2','RM3','RM4','RM5','RM6','FR','VT'] %}
+              <option value="{{ a }}">
               {% endfor %}
-            </select>
+            </datalist>
           </div>
           <div class="col-md-3">
             <label class="form-label fw-semibold">Centro</label>

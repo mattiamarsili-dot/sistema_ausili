@@ -64,16 +64,17 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label fw-semibold">ASL</label>
-            <select name="ente_pubblico" class="form-select">
-              <option value="">— seleziona —</option>
-              {% for asl in ['ASL Roma 1','ASL Roma 2','ASL Roma 3','ASL Roma 4','ASL Roma 5','ASL Roma 6','FR','LT','VT','RI','Altro'] %}
-              <option value="{{ asl }}" {% if pratica.ente_pubblico == asl %}selected{% endif %}>{{ asl }}</option>
+            <input type="text" name="ente_pubblico" id="input-asl" class="form-control" list="lista-asl-pratica"
+                   value="{{ pratica.ente_pubblico or '' }}" placeholder="es. RM1, FR…" autocomplete="off">
+            <datalist id="lista-asl-pratica">
+              {% for asl in ['RM1','RM2','RM3','RM4','RM5','RM6','FR','VT'] %}
+              <option value="{{ asl }}">
               {% endfor %}
-            </select>
+            </datalist>
           </div>
           <div class="col-md-4">
             <label class="form-label fw-semibold">Centro</label>
-            <select name="centro" class="form-select">
+            <select name="centro" id="select-centro" class="form-select">
               <option value="">— seleziona —</option>
               {% for c in CENTRI %}
               <option value="{{ c }}" {% if pratica.centro == c %}selected{% endif %}>{{ c }}</option>
@@ -579,17 +580,30 @@ function compilaConVarianti() {
 
 async function caricaDatiCliente(clienteId, forza = false) {
   if (!clienteId) return;
-  const campoMedico = document.getElementById('input-medico');
-  // Se il campo è già compilato e non è una richiesta forzata, non sovrascrivere
-  if (campoMedico.value.trim() && !forza) return;
+  const campoMedico  = document.getElementById('input-medico');
+  const campoAsl     = document.getElementById('input-asl');
+  const campoCentro  = document.getElementById('select-centro');
+  const tuttiVuoti   = !campoMedico.value.trim() && !campoAsl.value.trim() && !campoCentro.value;
+  if (!tuttiVuoti && !forza) return;
   try {
     const r = await fetch(`/api/clienti/${clienteId}`);
     if (!r.ok) return;
     const c = await r.json();
-    if (c.medico_referente) {
+    function evidenzia(el) {
+      el.classList.add('border-success');
+      setTimeout(() => el.classList.remove('border-success'), 1500);
+    }
+    if (c.medico_referente && (!campoMedico.value.trim() || forza)) {
       campoMedico.value = c.medico_referente;
-      campoMedico.classList.add('border-success');
-      setTimeout(() => campoMedico.classList.remove('border-success'), 1500);
+      evidenzia(campoMedico);
+    }
+    if (c.asl_competente && (!campoAsl.value.trim() || forza)) {
+      campoAsl.value = c.asl_competente;
+      evidenzia(campoAsl);
+    }
+    if (c.centro && (!campoCentro.value || forza)) {
+      campoCentro.value = c.centro;
+      evidenzia(campoCentro);
     }
   } catch(e) { console.error(e); }
 }
