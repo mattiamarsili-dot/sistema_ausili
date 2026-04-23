@@ -231,14 +231,60 @@
               <div class="card-body d-flex flex-column">
                 <div class="fw-semibold mb-1">{{ t.nome_template }}</div>
                 <div class="text-muted small mb-2">{{ t.tipo_documento or '' }} — {{ t.descrizione or '' }}</div>
+                {% if 'Prescrizione' in t.nome_template %}
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary mt-auto"
+                        onclick="apriModalVariante({{ t.id }}, '{{ pratica.ausilio_richiesto or '' }}', '{{ pratica.id }}')">
+                  <i class="bi bi-download me-1"></i> Genera PDF
+                </button>
+                {% else %}
                 <a href="{{ url_for('compila_pdf', template_id=t.id, pratica_id=pratica.id) }}"
                    class="btn btn-sm btn-outline-primary mt-auto">
                   <i class="bi bi-download me-1"></i> Genera PDF
                 </a>
+                {% endif %}
               </div>
             </div>
           </div>
           {% endfor %}
+
+          {# Modal selezione variante testo prescrizione #}
+          <div class="modal fade" id="modalVarianteTesto" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"><i class="bi bi-file-text me-2"></i>Testo prescrizione</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div id="varianteLoading" class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Carico varianti...
+                  </div>
+                  <div id="varianteContenuto" style="display:none">
+                    <div id="varianteNessuna" class="alert alert-info" style="display:none">
+                      <i class="bi bi-info-circle me-2"></i>
+                      Nessun testo configurato per questo tipo di ausilio.
+                      Verrà generato il PDF con le sezioni vuote.
+                    </div>
+                    <div id="varianteLista" style="display:none">
+                      <p class="mb-1 small">Spunta le varianti da includere per <strong id="varianteAusilioLabel"></strong>
+                        <span class="text-muted">(i testi vengono uniti in sequenza)</span>:</p>
+                      <div id="varianteCheckbox" class="d-flex flex-column gap-2 mt-2"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                  <a id="btnCompilaSenzaTesto" href="#" class="btn btn-outline-secondary">
+                    <i class="bi bi-file-earmark me-1"></i> Senza testo
+                  </a>
+                  <button id="btnCompilaConTesto" class="btn btn-primary" onclick="compilaConVarianti()" disabled>
+                    <i class="bi bi-download me-1"></i> Genera PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -446,6 +492,67 @@ function salvaVoci() {
 
 {% block scripts %}
 <script>
+let _varianteUrlBase = '';
+
+async function apriModalVariante(templateId, ausilio, praticaId) {
+  _varianteUrlBase = `/compila/${templateId}/${praticaId}`;
+
+  // Reset UI
+  document.getElementById('varianteLoading').style.display    = '';
+  document.getElementById('varianteContenuto').style.display  = 'none';
+  document.getElementById('varianteNessuna').style.display    = 'none';
+  document.getElementById('varianteLista').style.display      = 'none';
+  document.getElementById('btnCompilaConTesto').disabled      = true;
+  document.getElementById('btnCompilaSenzaTesto').href        = _varianteUrlBase;
+
+  new bootstrap.Modal(document.getElementById('modalVarianteTesto')).show();
+
+  try {
+    const r = await fetch(`/api/testi-prescrizione/varianti?ausilio=${encodeURIComponent(ausilio)}`);
+    const varianti = await r.json();
+
+    document.getElementById('varianteLoading').style.display  = 'none';
+    document.getElementById('varianteContenuto').style.display = '';
+
+    if (!varianti.length) {
+      document.getElementById('varianteNessuna').style.display = '';
+    } else {
+      document.getElementById('varianteAusilioLabel').textContent = ausilio;
+      const cont = document.getElementById('varianteCheckbox');
+      cont.innerHTML = '';
+      varianti.forEach((nome, i) => {
+        const id = `chk_variante_${i}`;
+        const div = document.createElement('div');
+        div.className = 'form-check border rounded p-2';
+        div.innerHTML = `
+          <input class="form-check-input variante-check" type="checkbox" id="${id}" value="${nome}"
+                 onchange="aggiornaBottoneCompila()">
+          <label class="form-check-label w-100" for="${id}">
+            <i class="bi bi-file-text me-1 text-primary"></i><strong>${nome}</strong>
+          </label>`;
+        cont.appendChild(div);
+      });
+      document.getElementById('varianteLista').style.display = '';
+    }
+  } catch(e) {
+    document.getElementById('varianteLoading').style.display  = 'none';
+    document.getElementById('varianteContenuto').style.display = '';
+    document.getElementById('varianteNessuna').style.display  = '';
+  }
+}
+
+function aggiornaBottoneCompila() {
+  const selezionate = document.querySelectorAll('.variante-check:checked').length;
+  document.getElementById('btnCompilaConTesto').disabled = (selezionate === 0);
+}
+
+function compilaConVarianti() {
+  const nomi = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
+  if (!nomi.length) return;
+  const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
+  window.location.href = `${_varianteUrlBase}?${params}`;
+}
+
 async function caricaDatiCliente(clienteId, forza = false) {
   if (!clienteId) return;
   const campoMedico = document.getElementById('input-medico');

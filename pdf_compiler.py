@@ -97,7 +97,81 @@ def _arricchisci_dati(dati: dict) -> dict:
     # Data di oggi formattata
     dati["data_oggi"] = datetime.now().strftime("%d/%m/%Y")
 
+    # Espandi voci nomenclatore in chiavi flat per i template AcroForm
+    # voci_0_codice, voci_0_descrizione, voci_0_quantita, ... (fino a 14 righe)
+    voci = dati.get("voci", [])
+    for i, v in enumerate(voci[:14]):
+        qty = v.get("quantita", 1)
+        # Formatta quantità: rimuove decimali inutili (1.0 → "1", 2.5 → "2,5")
+        if isinstance(qty, float) and qty == int(qty):
+            qty_str = str(int(qty))
+        else:
+            qty_str = str(qty).replace(".", ",")
+        dati[f"voci_{i}_codice"]     = str(v.get("codice_iso", "") or "")
+        dati[f"voci_{i}_descrizione"] = str(v.get("descrizione", "") or "")
+        dati[f"voci_{i}_quantita"]   = qty_str
+    # Pulisci le righe extra (se ci sono meno voci del max del template)
+    for i in range(len(voci), 14):
+        dati[f"voci_{i}_codice"]     = ""
+        dati[f"voci_{i}_descrizione"] = ""
+        dati[f"voci_{i}_quantita"]   = ""
+
+    # Testi predefiniti per Prescrizione Cloude, associati al tipo di ausilio
+    testi_path = os.path.join(os.path.dirname(__file__), "config", "testi_prescrizione.json")
+    if os.path.isfile(testi_path):
+        try:
+            with open(testi_path, encoding="utf-8") as f:
+                testi_map = json.load(f)
+            ausilio = dati.get("pratica", {}).get("ausilio_richiesto", "") or ""
+            varianti_richieste = dati.get("variante_testo") or []
+            if isinstance(varianti_richieste, str):
+                varianti_richieste = [varianti_richieste] if varianti_richieste else []
+            entry = testi_map.get(ausilio)
+            selezionate = []
+            if isinstance(entry, list) and entry:
+                if varianti_richieste:
+                    # Mantieni l'ordine scelto dall'utente
+                    selezionate = [v for nome in varianti_richieste
+                                   for v in entry if v.get("nome") == nome]
+                else:
+                    selezionate = [entry[0]]    # default: prima variante
+            elif isinstance(entry, dict):       # vecchio formato singola variante
+                selezionate = [entry]
+            if selezionate:
+                # Unisci i testi di tutte le varianti selezionate con riga vuota tra una e l'altra
+                def _unisci(campo):
+                    parti = [v.get(campo, "").strip() for v in selezionate if v.get(campo, "").strip()]
+                    return "\n\n".join(parti)
+                _espandi_testo(dati, "significato_riga", _unisci("significato"), 5, 118)
+                _espandi_testo(dati, "modi_riga",        _unisci("modi_impiego"), 6, 118)
+                _espandi_testo(dati, "controindicazioni_riga", _unisci("controindicazioni"), 2, 118)
+        except Exception:
+            pass
+
     return dati
+
+
+def _espandi_testo(dati: dict, prefisso: str, testo: str, max_righe: int, max_chars: int):
+    """Suddivide un testo in righe di max_chars caratteri e le inserisce in dati come prefisso_0, prefisso_1..."""
+    righe = []
+    if testo:
+        # Rispetta i ritorni a capo espliciti, poi spezza per lunghezza
+        for paragrafo in testo.split("\n"):
+            paragrafo = paragrafo.strip()
+            if not paragrafo:
+                if righe:  # riga vuota di separazione
+                    righe.append("")
+                continue
+            while len(paragrafo) > max_chars:
+                # Cerca spazio per andare a capo
+                idx = paragrafo.rfind(" ", 0, max_chars)
+                if idx == -1:
+                    idx = max_chars
+                righe.append(paragrafo[:idx])
+                paragrafo = paragrafo[idx:].lstrip()
+            righe.append(paragrafo)
+    for i in range(max_righe):
+        dati[f"{prefisso}_{i}"] = righe[i] if i < len(righe) else ""
 
 
 def _get_field_value(field_key: str, dati: dict) -> str:
@@ -160,14 +234,17 @@ def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: st
 
     field_values = {}
     for campo_pdf, chiave_dati in mappatura.items():
+        # Salta chiavi-commento (iniziano con _)
+        if campo_pdf.startswith("_"):
+            continue
+        # Salta valori placeholder
+        if chiave_dati == "_":
+            continue
         field_values[campo_pdf] = _get_field_value(chiave_dati, dati)
 
-    writer.update_page_form_field_values(writer.pages[0], field_values)
-
-    # Applica a tutte le pagine se necessario
-    if len(writer.pages) > 1:
-        for page in writer.pages[1:]:
-            writer.update_page_form_field_values(page, field_values)
+    # Applica a TUTTE le pagine (per PDF multi-pagina come Prescrizione)
+    for page in writer.pages:
+        writer.update_page_form_field_values(page, field_values)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(output_path, "wb") as f:

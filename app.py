@@ -301,6 +301,91 @@ def gestisci_chiavi():
                            suggerimenti=suggerimenti)
 
 
+TESTI_PATH = os.path.join(os.path.dirname(__file__), "config", "testi_prescrizione.json")
+
+
+def _carica_testi():
+    """Legge testi_prescrizione.json e normalizza la struttura a {ausilio: [varianti]}."""
+    if not os.path.isfile(TESTI_PATH):
+        return {}
+    with open(TESTI_PATH, encoding="utf-8") as f:
+        raw = json.load(f)
+    out = {}
+    for k, v in raw.items():
+        if k.startswith("_"):
+            continue
+        if isinstance(v, dict):          # vecchio formato singola variante → converti
+            v.setdefault("nome", "Standard")
+            out[k] = [v]
+        elif isinstance(v, list):
+            out[k] = v
+    return out
+
+
+def _salva_testi(testi: dict):
+    with open(TESTI_PATH, "w", encoding="utf-8") as f:
+        json.dump(testi, f, ensure_ascii=False, indent=2)
+
+
+@app.route("/templates/testi-prescrizione", methods=["GET", "POST"])
+def testi_prescrizione():
+    """Pagina per configurare i testi predefiniti della Prescrizione per tipo di ausilio."""
+    testi = _carica_testi()
+
+    if request.method == "POST":
+        azione  = request.form.get("azione")
+        ausilio = request.form.get("ausilio", "").strip()
+        nome_var= request.form.get("nome_variante", "").strip() or "Standard"
+
+        if azione == "salva_variante" and ausilio:
+            nuova = {
+                "nome":              nome_var,
+                "significato":       request.form.get("significato", "").strip(),
+                "modi_impiego":      request.form.get("modi_impiego", "").strip(),
+                "controindicazioni": request.form.get("controindicazioni", "").strip(),
+            }
+            lista = testi.get(ausilio, [])
+            # Aggiorna se nome già esistente, altrimenti aggiungi
+            idx = next((i for i, v in enumerate(lista) if v.get("nome") == nome_var), None)
+            if idx is not None:
+                lista[idx] = nuova
+            else:
+                lista.append(nuova)
+            testi[ausilio] = lista
+            _salva_testi(testi)
+            flash(f"Variante '{nome_var}' per '{ausilio}' salvata.", "success")
+
+        elif azione == "elimina_variante" and ausilio:
+            lista = testi.get(ausilio, [])
+            lista = [v for v in lista if v.get("nome") != nome_var]
+            if lista:
+                testi[ausilio] = lista
+            else:
+                del testi[ausilio]        # nessuna variante rimasta → rimuovi ausilio
+            _salva_testi(testi)
+            flash(f"Variante '{nome_var}' eliminata.", "success")
+
+        elif azione == "elimina_ausilio" and ausilio:
+            testi.pop(ausilio, None)
+            _salva_testi(testi)
+            flash(f"Tutti i testi per '{ausilio}' eliminati.", "success")
+
+        return redirect(url_for("testi_prescrizione"))
+
+    return render_template("testi_prescrizione.html",
+                           testi=testi,
+                           ausilii=AUSILII_LIST)
+
+
+@app.route("/api/testi-prescrizione/varianti")
+def api_varianti_testo():
+    """Restituisce le varianti di testo disponibili per un dato ausilio."""
+    ausilio = request.args.get("ausilio", "")
+    testi = _carica_testi()
+    varianti = [v.get("nome", f"Variante {i+1}") for i, v in enumerate(testi.get(ausilio, []))]
+    return jsonify(varianti)
+
+
 # ── COMPILAZIONE PDF ─────────────────────────────────────────────────────────
 
 @app.route("/compila/<int:template_id>/<int:pratica_id>")
@@ -318,7 +403,8 @@ def compila_pdf(template_id, pratica_id):
         "cliente": cliente,
         "pratica": pratica,
         "voci": voci,
-        "data_oggi": __import__("datetime").date.today().strftime("%d/%m/%Y")
+        "data_oggi": __import__("datetime").date.today().strftime("%d/%m/%Y"),
+        "variante_testo": request.args.getlist("variante"),   # lista nomi varianti testo prescrizione
     }
 
     try:

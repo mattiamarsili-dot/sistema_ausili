@@ -1,0 +1,34 @@
+{
+  "Moveon": [
+    {
+      "nome": "Hand Brace",
+      "significato": "Ortesi su misura indispensabile per il contrasto attivo su base meccanica e propocettiva della rigidità su tutte le dita dell' arto superiore al fine di prolungare l'azione di trattamenti farmacologici e riabilitativi prevendo dolori e blocchi articolari.",
+      "modi_impiego": "Giornaliero a tolleranza",
+      "controindicazioni": "Nessuna"
+    },
+    {
+      "nome": "Afo Brace",
+      "significato": "Ortesi su misura indispensabile per il contrasto attivo su base meccanica e propocettiva degli atteggiamenti scorretti dell'arto inferiore prevendo o correggendo, piede cadente,difetti di pronazione e supinazione.\r\nIl tutore permette tramite tiranti elicoidali di correggere con la massima personalizzazione tono muscolare patologico.",
+      "modi_impiego": "Giornaliero a tolleranza",
+      "controindicazioni": "Nessuna"
+    },
+    {
+      "nome": "Hip Brace",
+      "significato": "Ortesi su misura indispensabile per il contrasto attivo su base meccanica e propocettiva dell'instabilità del bacino con naturale miglioramento di equilibrio e controllo muscolare su catena glutea e dei quadricipiti",
+      "modi_impiego": "Giornaliero a tolleranza",
+      "controindicazioni": "Nessuno"
+    },
+    {
+      "nome": "Spine Brace",
+      "significato": "Ortesi su misura indispensabile per il contrasto attivo su base meccanica e propocettiva della caduta ed instabilità del tronco correggendo atteggiamenti cifotici e in disallineamento.",
+      "modi_impiego": "Giornaliero a tolleranza",
+      "controindicazioni": "Nessuna"
+    },
+    {
+      "nome": "Shoulder Brace",
+      "significato": "Ortesi su misura indispensabile per il contrasto attivo su base meccanica e propocettiva per deficit dell'articolazione della spalla e dell'arto plegico",
+      "modi_impiego": "Giornaliero a tolleranza",
+      "controindicazioni": "Nessuno"
+    }
+  ]
+}
