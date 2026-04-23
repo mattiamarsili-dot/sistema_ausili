@@ -469,6 +469,9 @@ function salvaVoci() {
     voci.push({ codice_iso: codice, descrizione: desc, quantita: qty, prezzo_unitario: pu, prezzo_totale: Math.round(qty*pu*100)/100 });
   });
 
+  // Calcola subtotale netto dalle voci correnti
+  const subtotale = voci.reduce((acc, v) => acc + v.prezzo_totale, 0);
+
   fetch(`/api/pratica/${PRATICA_ID}/voci`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -479,6 +482,13 @@ function salvaVoci() {
     const st = document.getElementById('statoSalvataggio');
     st.textContent = `✓ Salvate ${data.n} voci`;
     st.className = 'text-success small fw-semibold';
+    // Aggiorna il campo Importo Preventivo nel form con il totale netto
+    const campoImporto = document.querySelector('input[name="importo_preventivo"]');
+    if (campoImporto) {
+      campoImporto.value = subtotale.toFixed(2);
+      campoImporto.classList.add('border-success');
+      setTimeout(() => campoImporto.classList.remove('border-success'), 1500);
+    }
   })
   .catch(() => {
     document.getElementById('statoSalvataggio').textContent = '✗ Errore salvataggio';
