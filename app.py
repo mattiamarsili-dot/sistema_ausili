@@ -27,9 +27,8 @@ AUSILII_LIST = [
 
 # ── INIT ─────────────────────────────────────────────────────────────────────
 
-@app.before_request
-def setup():
-    db.init_db()
+# Init DB una volta sola all'avvio (non ad ogni request)
+db.init_db()
 
 
 # ── HOME / DASHBOARD ─────────────────────────────────────────────────────────
