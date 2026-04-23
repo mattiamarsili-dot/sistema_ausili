@@ -10,11 +10,11 @@
     "Text3":        "cliente.citta_cap",
     "Text4":        "cliente.indirizzo",
     "Text5":        "cliente.data_nascita",
-    "Text6":        "cliente.telefono",
-    "Text7":        "cliente.centro",
+    "Text6":        "cliente.centro",
+    "Text7":        "cliente.telefono",
 
     "Cod. ISO.0.0":        "voci_0_codice",
-    "Descr. ISO.0.0.0.0":  "voci_0_descrizione",
+    "Descr. ISO.0.0.1.0":  "voci_0_descrizione",
     "Q.tà.0.0":            "voci_0_quantita",
     "€ Uni.0.0":           "voci_0_prezzo_unitario",
     "€ Tot.0.0":           "voci_0_prezzo_totale",
@@ -104,7 +104,7 @@
     "€ Tot.14.0":           "voci_14_prezzo_totale",
 
     "Cod. ISO.15.0":       "voci_15_codice",
-    "Descr. ISO.0.0.1.0":  "voci_15_descrizione",
+    "Descr. ISO.0.0.0.0":  "voci_15_descrizione",
     "Q.tà.15.0":           "voci_15_quantita",
     "€ Uni.15.0":          "voci_15_prezzo_unitario",
     "€ Tot.15.0":          "voci_15_prezzo_totale",

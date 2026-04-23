@@ -266,9 +266,9 @@ def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: st
             continue
         field_values[campo_pdf] = _get_field_value(chiave_dati, dati)
 
-    # Applica a TUTTE le pagine (per PDF multi-pagina come Prescrizione)
+    # Applica a TUTTE le pagine (auto_regenerate=False mantiene font/dimensione originale del PDF)
     for page in writer.pages:
-        writer.update_page_form_field_values(page, field_values)
+        writer.update_page_form_field_values(page, field_values, auto_regenerate=False)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(output_path, "wb") as f:
