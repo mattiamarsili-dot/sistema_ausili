@@ -243,6 +243,28 @@ def get_pdf_form_fields(pdf_path: str) -> list[dict]:
         return [{"errore": str(e)}]
 
 
+def _imposta_font_campi(writer: "PdfWriter", da_string: str = "/Helv 10 Tf 0 g") -> None:
+    """Imposta il Default Appearance (font e dimensione) su tutti i campi AcroForm."""
+    from pypdf.generic import NameObject, create_string_object
+
+    def _processa(field_ref):
+        try:
+            field = field_ref.get_object()
+            field[NameObject("/DA")] = create_string_object(da_string)
+            if "/Kids" in field:
+                for kid in field["/Kids"]:
+                    _processa(kid)
+        except Exception:
+            pass
+
+    root = writer._root_object
+    if "/AcroForm" in root:
+        acroform = root["/AcroForm"].get_object()
+        if "/Fields" in acroform:
+            for field_ref in acroform["/Fields"]:
+                _processa(field_ref)
+
+
 def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: str) -> str:
     """
     Compila un PDF con campi AcroForm.
@@ -256,6 +278,9 @@ def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: st
     writer = PdfWriter()
     writer.append(reader)
 
+    # Forza Helvetica 10pt (equivalente Arial) su tutti i campi
+    _imposta_font_campi(writer, "/Helv 10 Tf 0 g")
+
     field_values = {}
     for campo_pdf, chiave_dati in mappatura.items():
         # Salta chiavi-commento (iniziano con _)
@@ -266,9 +291,9 @@ def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: st
             continue
         field_values[campo_pdf] = _get_field_value(chiave_dati, dati)
 
-    # Applica a TUTTE le pagine (auto_regenerate=False mantiene font/dimensione originale del PDF)
+    # Applica a TUTTE le pagine
     for page in writer.pages:
-        writer.update_page_form_field_values(page, field_values, auto_regenerate=False)
+        writer.update_page_form_field_values(page, field_values, auto_regenerate=True)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(output_path, "wb") as f:
