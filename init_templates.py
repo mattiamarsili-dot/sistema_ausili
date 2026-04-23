@@ -9,20 +9,44 @@ TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), "data", "pdf_templates")
 
 TEMPLATES = [
     {
-        "nome_template": "Deleghe_Rm3",
-        "file_path": os.path.join(TEMPLATES_DIR, "Deleghe_Rm3.pdf"),
-        "tipo_documento": "Delega + Autocertificazione",
-        "asl_filter": "Roma 3",
-        "descrizione": "ASL Roma 3 — Modulo 10. Autocertificazione (pag.1) + Modello di Delega (pag.2). Compilazione overlay.",
-        "mappatura": ""  # Usa config/Deleghe_Rm3_mapping.json
+        "nome_template": "Prescrizione_Cloude",
+        "file_path": os.path.join(TEMPLATES_DIR, "Prescrizione_Cloude.pdf"),
+        "tipo_documento": "Prescrizione",
+        "asl_filter": "",
+        "descrizione": "Prescrizione DM 332/1999 — universale per tutte le ASL. AcroForm.",
+        "mappatura": ""
+    },
+    {
+        "nome_template": "Delega_Sapio",
+        "file_path": os.path.join(TEMPLATES_DIR, "Delega_Sapio.pdf"),
+        "tipo_documento": "Delega",
+        "asl_filter": "",
+        "descrizione": "Delega SAPIO LIFE — valida per tutte le ASL. AcroForm 2 pagine.",
+        "mappatura": ""
+    },
+    {
+        "nome_template": "MODELLO_PREVENTIVI_2026",
+        "file_path": os.path.join(TEMPLATES_DIR, "MODELLO_PREVENTIVI_2026.pdf"),
+        "tipo_documento": "Preventivo",
+        "asl_filter": "",
+        "descrizione": "Modello preventivo 2026 — universale. Overlay tabella voci.",
+        "mappatura": ""
     },
     {
         "nome_template": "Delega_RM2_Compilabile",
         "file_path": os.path.join(TEMPLATES_DIR, "Delega_RM2_Compilabile.pdf"),
         "tipo_documento": "Delega + Autocertificazione",
-        "asl_filter": "Roma 2",
-        "descrizione": "ASL Roma 2 — PDF compilabile (AcroForm). Delega a SAPIO LIFE (pag.1) + Allegato 5 Autocertificazione (pag.2). I nomi dei campi AcroForm vanno verificati con Python.",
-        "mappatura": ""  # Usa config/Delega_RM2_Compilabile_mapping.json
+        "asl_filter": "RM2",
+        "descrizione": "ASL RM2 — PDF compilabile (AcroForm). Delega SAPIO LIFE (pag.1) + Allegato 5 Autocertificazione (pag.2).",
+        "mappatura": ""
+    },
+    {
+        "nome_template": "Deleghe_Rm3",
+        "file_path": os.path.join(TEMPLATES_DIR, "Deleghe_Rm3.pdf"),
+        "tipo_documento": "Delega + Autocertificazione",
+        "asl_filter": "RM3",
+        "descrizione": "ASL RM3 — Modulo 10. Autocertificazione (pag.1) + Modello di Delega (pag.2). Overlay.",
+        "mappatura": ""
     },
 ]
 
@@ -39,4 +63,4 @@ if __name__ == "__main__":
         else:
             db.save_template(t)
             print(f"✅ Aggiunto: {t['nome_template']}")
-    print("\nTemplate registrati nel database.")
+    print("\nDone — template registrati nel database.")
