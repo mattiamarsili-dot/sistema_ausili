@@ -1,6 +1,6 @@
 {
   "_tipo": "form",
-  "_note": "Prescrizione Cloude (DM 332/1999). Tabella presidi 7 righe: SX=Q.tà (Text3/Text1.x.0), CENTER=Descrizione (Text2.x.0), DX=Codici ISO (Text4.x.0). Significato terapeutico: 8 righe (colonna centrale Signifìcato_1/_3/...). Pag.2: Modi impiego 6 righe, Controindicazioni 2 righe.",
+  "_note": "Prescrizione Cloude (DM 332/1999). Tabella presidi 15 righe totali: righe 0-6 = Text3/Text1.x.0 (Q.tà), Text2.x.0 (Descrizione), Text4.x.0 (Codice ISO); righe 7-14 = Signifìcato (Q.tà), Signifìcato_1 (Descrizione), indicando (Codice). Pag.2: Modi impiego 6 righe, Controindicazioni 2 righe.",
   "campi": {
 
     "field0_1": "cliente.cognome",
@@ -15,8 +15,12 @@
     "field9_1": "cliente.provincia",
     "field10_1": "cliente.codice_fiscale",
     "field11_1": "cliente.telefono",
+    "field12_1": "cliente.tipo_disabilita",
     "field13_1": "cliente.tipo_disabilita",
 
+    "Data": "data_oggi",
+
+    "_note_voci_0_6": "Tabella presidi righe 0-6: SX=Q.tà, CENTER=Descrizione, DX=Codice ISO",
     "Text3":         "voci_0_quantita",
     "Text2.0.0":     "voci_0_descrizione",
     "Text4.0.0":     "voci_0_codice",
@@ -45,7 +49,40 @@
     "Text2.5.0.1.0": "voci_6_descrizione",
     "Text4.6.0":     "voci_6_codice",
 
-    "_note_significato": "Significato terapeutico — 5 righe sotto 'riconducibili:' (pag.1)",
+    "_note_voci_7_14": "Tabella presidi righe 7-14: SX=Q.tà (Signifìcato pari), CENTER=Descrizione (Signifìcato dispari), DX=Codice ISO (indicando)",
+    "Signifìcato":    "voci_7_quantita",
+    "Signifìcato_1":  "voci_7_descrizione",
+    "indicando":      "voci_7_codice",
+
+    "Signifìcato_2":  "voci_8_quantita",
+    "Signifìcato_3":  "voci_8_descrizione",
+    "indicando_1":    "voci_8_codice",
+
+    "Signifìcato_4":  "voci_9_quantita",
+    "Signifìcato_5":  "voci_9_descrizione",
+    "indicando_2":    "voci_9_codice",
+
+    "Signifìcato_6":  "voci_10_quantita",
+    "Signifìcato_7":  "voci_10_descrizione",
+    "indicando_3":    "voci_10_codice",
+
+    "Signifìcato_8":  "voci_11_quantita",
+    "Signifìcato_9":  "voci_11_descrizione",
+    "indicando_4":    "voci_11_codice",
+
+    "Signifìcato_10": "voci_12_quantita",
+    "Signifìcato_11": "voci_12_descrizione",
+    "indicando_5":    "voci_12_codice",
+
+    "Signifìcato_12": "voci_13_quantita",
+    "Signifìcato_13": "voci_13_descrizione",
+    "indicando_6":    "voci_13_codice",
+
+    "Signifìcato_14": "voci_14_quantita",
+    "Signifìcato_15": "voci_14_descrizione",
+    "indicando_7":    "voci_14_codice",
+
+    "_note_significato": "Significato terapeutico — 5 righe di testo libero (pag.1)",
     "field63_1": "significato_riga_0",
     "field64_1": "significato_riga_1",
     "field65_1": "significato_riga_2",

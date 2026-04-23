@@ -100,7 +100,7 @@ def _arricchisci_dati(dati: dict) -> dict:
     # Espandi voci nomenclatore in chiavi flat per i template AcroForm
     # voci_0_codice, voci_0_descrizione, voci_0_quantita, ... (fino a 14 righe)
     voci = dati.get("voci", [])
-    for i, v in enumerate(voci[:14]):
+    for i, v in enumerate(voci[:15]):
         qty = v.get("quantita", 1)
         # Formatta quantità: rimuove decimali inutili (1.0 → "1", 2.5 → "2,5")
         if isinstance(qty, float) and qty == int(qty):
@@ -111,7 +111,7 @@ def _arricchisci_dati(dati: dict) -> dict:
         dati[f"voci_{i}_descrizione"] = str(v.get("descrizione", "") or "")
         dati[f"voci_{i}_quantita"]   = qty_str
     # Pulisci le righe extra (se ci sono meno voci del max del template)
-    for i in range(len(voci), 14):
+    for i in range(len(voci), 15):
         dati[f"voci_{i}_codice"]     = ""
         dati[f"voci_{i}_descrizione"] = ""
         dati[f"voci_{i}_quantita"]   = ""
