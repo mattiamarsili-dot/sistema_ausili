@@ -1,0 +1,116 @@
+{
+  "_tipo": "form",
+  "_note": "Preventivo Altra Mobilità (AM.pdf) — AcroForm 16 righe voci, IVA 4%",
+  "campi": {
+    "ASL":          "asl_competente",
+    "Data Odierna": "data_oggi",
+    "N. Preven":    "data_oggi_ddmm",
+    "Text1":        "cliente.cognome_nome",
+    "Text2":        "cliente.luogo_nascita",
+    "Text3":        "cliente.citta_cap",
+    "Text4":        "cliente.indirizzo",
+    "Text5":        "cliente.data_nascita",
+    "Text6":        "cliente.telefono",
+    "Text7":        "cliente.centro",
+
+    "Cod. ISO.0.0":        "voci_0_codice",
+    "Descr. ISO.0.0.0.0":  "voci_0_descrizione",
+    "Q.tà.0.0":            "voci_0_quantita",
+    "€ Uni.0.0":           "voci_0_prezzo_unitario",
+    "€ Tot.0.0":           "voci_0_prezzo_totale",
+
+    "Cod. ISO.1.0":  "voci_1_codice",
+    "Descr. ISO.1.0": "voci_1_descrizione",
+    "Q.tà.1.0":      "voci_1_quantita",
+    "€ Uni.1.0":     "voci_1_prezzo_unitario",
+    "€ Tot.1.0":     "voci_1_prezzo_totale",
+
+    "Cod. ISO.2.0":  "voci_2_codice",
+    "Descr. ISO.2.0": "voci_2_descrizione",
+    "Q.tà.2.0":      "voci_2_quantita",
+    "€ Uni.2.0":     "voci_2_prezzo_unitario",
+    "€ Tot.2.0":     "voci_2_prezzo_totale",
+
+    "Cod. ISO.3.0":  "voci_3_codice",
+    "Descr. ISO.3.0": "voci_3_descrizione",
+    "Q.tà.3.0":      "voci_3_quantita",
+    "€ Uni.3.0":     "voci_3_prezzo_unitario",
+    "€ Tot.3.0":     "voci_3_prezzo_totale",
+
+    "Cod. ISO.4.0":        "voci_4_codice",
+    "Descr. ISO.4.0.0.0":  "voci_4_descrizione",
+    "Q.tà.4.0":            "voci_4_quantita",
+    "€ Uni.4.0":           "voci_4_prezzo_unitario",
+    "€ Tot.4.0":           "voci_4_prezzo_totale",
+
+    "Cod. ISO.5.0":        "voci_5_codice",
+    "Descr. ISO.4.0.1.0":  "voci_5_descrizione",
+    "Q.tà.5.0":            "voci_5_quantita",
+    "€ Uni.5.0":           "voci_5_prezzo_unitario",
+    "€ Tot.5.0":           "voci_5_prezzo_totale",
+
+    "Cod. ISO.6.0":        "voci_6_codice",
+    "Descr. ISO.4.0.2.0":  "voci_6_descrizione",
+    "Q.tà.6.0":            "voci_6_quantita",
+    "€ Uni.6.0":           "voci_6_prezzo_unitario",
+    "€ Tot.6.0":           "voci_6_prezzo_totale",
+
+    "Cod. ISO.7.0":        "voci_7_codice",
+    "Descr. ISO.4.0.3.0":  "voci_7_descrizione",
+    "Q.tà.7.0":            "voci_7_quantita",
+    "€ Uni.7.0":           "voci_7_prezzo_unitario",
+    "€ Tot.7.0":           "voci_7_prezzo_totale",
+
+    "Cod. ISO.8.0":        "voci_8_codice",
+    "Descr. ISO.4.0.4.0":  "voci_8_descrizione",
+    "Q.tà.8.0":            "voci_8_quantita",
+    "€ Uni.8.0":           "voci_8_prezzo_unitario",
+    "€ Tot.8.0":           "voci_8_prezzo_totale",
+
+    "Cod. ISO.9.0":        "voci_9_codice",
+    "Descr. ISO.4.0.5.0":  "voci_9_descrizione",
+    "Q.tà.9.0":            "voci_9_quantita",
+    "€ Uni.9.0":           "voci_9_prezzo_unitario",
+    "€ Tot.9.0":           "voci_9_prezzo_totale",
+
+    "Cod. ISO.10.0":        "voci_10_codice",
+    "Descr. ISO.4.0.6.0":   "voci_10_descrizione",
+    "Q.tà.10.0":            "voci_10_quantita",
+    "€ Uni.10.0":           "voci_10_prezzo_unitario",
+    "€ Tot.10.0":           "voci_10_prezzo_totale",
+
+    "Cod. ISO.11.0":        "voci_11_codice",
+    "Descr. ISO.4.0.7.0":   "voci_11_descrizione",
+    "Q.tà.11.0":            "voci_11_quantita",
+    "€ Uni.11.0":           "voci_11_prezzo_unitario",
+    "€ Tot.11.0":           "voci_11_prezzo_totale",
+
+    "Cod. ISO.12.0":        "voci_12_codice",
+    "Descr. ISO.4.0.8.0":   "voci_12_descrizione",
+    "Q.tà.12.0":            "voci_12_quantita",
+    "€ Uni.12.0":           "voci_12_prezzo_unitario",
+    "€ Tot.12.0":           "voci_12_prezzo_totale",
+
+    "Cod. ISO.13.0":        "voci_13_codice",
+    "Descr. ISO.4.0.9.0":   "voci_13_descrizione",
+    "Q.tà.13.0":            "voci_13_quantita",
+    "€ Uni.13.0":           "voci_13_prezzo_unitario",
+    "€ Tot.13.0":           "voci_13_prezzo_totale",
+
+    "Cod. ISO.14.0":        "voci_14_codice",
+    "Descr. ISO.4.0.10.0":  "voci_14_descrizione",
+    "Q.tà.14.0":            "voci_14_quantita",
+    "€ Uni.14.0":           "voci_14_prezzo_unitario",
+    "€ Tot.14.0":           "voci_14_prezzo_totale",
+
+    "Cod. ISO.15.0":       "voci_15_codice",
+    "Descr. ISO.0.0.1.0":  "voci_15_descrizione",
+    "Q.tà.15.0":           "voci_15_quantita",
+    "€ Uni.15.0":          "voci_15_prezzo_unitario",
+    "€ Tot.15.0":          "voci_15_prezzo_totale",
+
+    "Tot. Uni": "subtotale",
+    "IVA":      "iva_importo",
+    "Text8":    "totale_finale"
+  }
+}

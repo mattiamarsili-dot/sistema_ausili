@@ -1,0 +1,82 @@
+{
+  "_tipo": "form",
+  "_note": "Prescrizione Altra Mobilità — Santa Lucia — AcroForm 15 righe voci, 5 righe significato terapeutico + diagnosi (pag.2)",
+  "campi": {
+    "Cognome":       "cliente.cognome",
+    "Nome":          "cliente.nome",
+    "CF":            "cliente.codice_fiscale",
+    "Data Nascita":  "cliente.data_nascita",
+    "Luogo Nascita": "cliente.luogo_nascita",
+    "Telef":         "cliente.telefono",
+    "Via res":       "cliente.indirizzo",
+    "Comun":         "cliente.citta",
+    "Prov":          "cliente.provincia",
+    "Diagnosi":      "cliente.tipo_disabilita",
+
+    "Codici ISO.0.0":   "voci_0_codice",
+    "Descrizione. ISO.0.0": "voci_0_descrizione",
+    "Q.tà.0.0":         "voci_0_quantita",
+
+    "Codici ISO.1.0":   "voci_1_codice",
+    "Descrizione. ISO.1.0": "voci_1_descrizione",
+    "Q.tà.1.0":         "voci_1_quantita",
+
+    "Codici ISO.2.0":   "voci_2_codice",
+    "Descrizione. ISO.2.0": "voci_2_descrizione",
+    "Q.tà.2.0":         "voci_2_quantita",
+
+    "Codici ISO.3.0":   "voci_3_codice",
+    "Descrizione. ISO.3.0": "voci_3_descrizione",
+    "Q.tà.3.0":         "voci_3_quantita",
+
+    "Codici ISO.4.0":   "voci_4_codice",
+    "Descrizione. ISO.4.0": "voci_4_descrizione",
+    "Q.tà.4.0":         "voci_4_quantita",
+
+    "Codici ISO.5.0":   "voci_5_codice",
+    "Descrizione. ISO.5.0": "voci_5_descrizione",
+    "Q.tà.5.0":         "voci_5_quantita",
+
+    "Codici ISO.6.0":   "voci_6_codice",
+    "Descrizione. ISO.6.0": "voci_6_descrizione",
+    "Q.tà.6.0":         "voci_6_quantita",
+
+    "Codici ISO.7.0":   "voci_7_codice",
+    "Descrizione. ISO.7.0": "voci_7_descrizione",
+    "Q.tà.7.0":         "voci_7_quantita",
+
+    "Codici ISO.8.0":   "voci_8_codice",
+    "Descrizione. ISO.8.0": "voci_8_descrizione",
+    "Q.tà.8.0":         "voci_8_quantita",
+
+    "Codici ISO.9.0":   "voci_9_codice",
+    "Descrizione. ISO.9.0": "voci_9_descrizione",
+    "Q.tà.9.0":         "voci_9_quantita",
+
+    "Codici ISO.10.0":  "voci_10_codice",
+    "Descrizione. ISO.10.0": "voci_10_descrizione",
+    "Q.tà.10.0":        "voci_10_quantita",
+
+    "Codici ISO.11.0":  "voci_11_codice",
+    "Descrizione. ISO.11.0": "voci_11_descrizione",
+    "Q.tà.11.0":        "voci_11_quantita",
+
+    "Codici ISO.12.0":  "voci_12_codice",
+    "Descrizione. ISO.12.0": "voci_12_descrizione",
+    "Q.tà.12.0":        "voci_12_quantita",
+
+    "Codici ISO.13.0":  "voci_13_codice",
+    "Descrizione. ISO.13.0": "voci_13_descrizione",
+    "Q.tà.13.0":        "voci_13_quantita",
+
+    "Codici ISO.14.0":  "voci_14_codice",
+    "Descrizione. ISO.14.0": "voci_14_descrizione",
+    "Q.tà.14.0":        "voci_14_quantita",
+
+    "Sign. Terap.0.0": "significato_riga_0",
+    "Sign. Terap.1.0": "significato_riga_1",
+    "Sign. Terap.2.0": "significato_riga_2",
+    "Sign. Terap.3.0": "significato_riga_3",
+    "Sign. Terap.4.0": "significato_riga_4"
+  }
+}

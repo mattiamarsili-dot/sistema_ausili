@@ -28,6 +28,10 @@ except ImportError:
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "data", "output")
 
 
+def _fmt_euro(val: float) -> str:
+    return f"€ {val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
 def _arricchisci_dati(dati: dict) -> dict:
     """
     Aggiunge chiavi derivate utili per i template:
@@ -97,24 +101,44 @@ def _arricchisci_dati(dati: dict) -> dict:
     # Data di oggi formattata
     dati["data_oggi"] = datetime.now().strftime("%d/%m/%Y")
 
+    # Data oggi in formato ddmm (per campo N. Preven in AM.pdf)
+    dati["data_oggi_ddmm"] = datetime.now().strftime("%d%m")
+
+    # Città + CAP combinati
+    c["citta_cap"] = f"{c.get('citta','').strip()} {c.get('cap','').strip()}".strip()
+    dati["cliente"] = c
+
     # Espandi voci nomenclatore in chiavi flat per i template AcroForm
-    # voci_0_codice, voci_0_descrizione, voci_0_quantita, ... (fino a 14 righe)
+    # voci_0_codice, voci_0_descrizione, voci_0_quantita, ... (fino a 16 righe)
     voci = dati.get("voci", [])
-    for i, v in enumerate(voci[:14]):
+    subtotale_voci = 0.0
+    for i, v in enumerate(voci[:16]):
         qty = v.get("quantita", 1)
         # Formatta quantità: rimuove decimali inutili (1.0 → "1", 2.5 → "2,5")
         if isinstance(qty, float) and qty == int(qty):
             qty_str = str(int(qty))
         else:
             qty_str = str(qty).replace(".", ",")
-        dati[f"voci_{i}_codice"]     = str(v.get("codice_iso", "") or "")
-        dati[f"voci_{i}_descrizione"] = str(v.get("descrizione", "") or "")
-        dati[f"voci_{i}_quantita"]   = qty_str
+        p_u = float(v.get("prezzo_unitario", 0) or 0)
+        p_t = float(v.get("prezzo_totale", 0) or 0)
+        subtotale_voci += p_t
+        dati[f"voci_{i}_codice"]           = str(v.get("codice_iso", "") or "")
+        dati[f"voci_{i}_descrizione"]      = str(v.get("descrizione", "") or "")
+        dati[f"voci_{i}_quantita"]         = qty_str
+        dati[f"voci_{i}_prezzo_unitario"]  = _fmt_euro(p_u) if p_u else ""
+        dati[f"voci_{i}_prezzo_totale"]    = _fmt_euro(p_t) if p_t else ""
     # Pulisci le righe extra (se ci sono meno voci del max del template)
-    for i in range(len(voci), 14):
-        dati[f"voci_{i}_codice"]     = ""
-        dati[f"voci_{i}_descrizione"] = ""
-        dati[f"voci_{i}_quantita"]   = ""
+    for i in range(len(voci), 16):
+        dati[f"voci_{i}_codice"]          = ""
+        dati[f"voci_{i}_descrizione"]     = ""
+        dati[f"voci_{i}_quantita"]        = ""
+        dati[f"voci_{i}_prezzo_unitario"] = ""
+        dati[f"voci_{i}_prezzo_totale"]   = ""
+    # Totali calcolati dalle voci
+    iva_voci = round(subtotale_voci * 0.04, 2)
+    dati["subtotale"]    = _fmt_euro(subtotale_voci)
+    dati["iva_importo"]  = _fmt_euro(iva_voci)
+    dati["totale_finale"] = _fmt_euro(round(subtotale_voci + iva_voci, 2))
 
     # Testi predefiniti per Prescrizione Cloude, associati al tipo di ausilio
     testi_path = os.path.join(os.path.dirname(__file__), "config", "testi_prescrizione.json")
@@ -319,8 +343,7 @@ def compila_preventivo_pdf(pdf_path: str, dati: dict, output_path: str) -> str:
     iva = round(subtotale * 0.04, 2)
     totale_lordo = round(subtotale + iva, 2)
 
-    def fmt_euro(val):
-        return f"€ {val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    fmt_euro = _fmt_euro
 
     reader = PdfReader(pdf_path)
     writer = PdfWriter()
