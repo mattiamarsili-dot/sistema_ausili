@@ -275,9 +275,9 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                  <a id="btnCompilaSenzaTesto" href="#" class="btn btn-outline-secondary">
+                  <button class="btn btn-outline-secondary" onclick="compilaSenzaTesto()">
                     <i class="bi bi-file-earmark me-1"></i> Senza testo
-                  </a>
+                  </button>
                   <button id="btnCompilaConTesto" class="btn btn-primary" onclick="compilaConVarianti()" disabled>
                     <i class="bi bi-download me-1"></i> Genera PDF
                   </button>
@@ -494,6 +494,19 @@ function salvaVoci() {
 <script>
 let _varianteUrlBase = '';
 
+function compilaSenzaTesto() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modalVarianteTesto'));
+  if (modal) modal.hide();
+  setTimeout(() => {
+    const a = document.createElement('a');
+    a.href = _varianteUrlBase;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, 300);
+}
+
 async function apriModalVariante(templateId, ausilio, praticaId) {
   _varianteUrlBase = `/compila/${templateId}/${praticaId}`;
 
@@ -550,7 +563,18 @@ function compilaConVarianti() {
   const nomi = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
   if (!nomi.length) return;
   const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
-  window.location.href = `${_varianteUrlBase}?${params}`;
+  const url = `${_varianteUrlBase}?${params}`;
+  // Chiudi modal, poi scarica dopo breve delay
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modalVarianteTesto'));
+  if (modal) modal.hide();
+  setTimeout(() => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, 300);
 }
 
 async function caricaDatiCliente(clienteId, forza = false) {
