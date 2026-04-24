@@ -389,9 +389,28 @@ def api_varianti_testo():
     return jsonify(varianti)
 
 
+@app.route("/api/testi-prescrizione/anteprima")
+def api_anteprima_testo():
+    """Restituisce il testo significato unito per ausilio + varianti selezionate."""
+    ausilio = request.args.get("ausilio", "")
+    varianti_richieste = request.args.getlist("variante")
+    testi = _carica_testi()
+    entry = testi.get(ausilio, [])
+    if varianti_richieste:
+        selezionate = [v for nome in varianti_richieste for v in entry if v.get("nome") == nome]
+    else:
+        selezionate = [entry[0]] if entry else []
+    testo = "\n\n".join(
+        v.get("significato", "").strip()
+        for v in selezionate
+        if v.get("significato", "").strip()
+    )
+    return jsonify({"testo": testo})
+
+
 # ── COMPILAZIONE PDF ─────────────────────────────────────────────────────────
 
-@app.route("/compila/<int:template_id>/<int:pratica_id>")
+@app.route("/compila/<int:template_id>/<int:pratica_id>", methods=["GET", "POST"])
 def compila_pdf(template_id, pratica_id):
     pratica = db.get_pratica(pratica_id)
     if not pratica:
@@ -407,7 +426,8 @@ def compila_pdf(template_id, pratica_id):
         "pratica": pratica,
         "voci": voci,
         "data_oggi": __import__("datetime").date.today().strftime("%d/%m/%Y"),
-        "variante_testo": request.args.getlist("variante"),   # lista nomi varianti testo prescrizione
+        "variante_testo": request.args.getlist("variante"),
+        "significato_custom": request.form.get("significato_custom", ""),
     }
 
     try:

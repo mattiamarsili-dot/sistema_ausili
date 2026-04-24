@@ -249,6 +249,11 @@
           </div>
           {% endfor %}
 
+          {# Form nascosto per POST compilazione con testo personalizzato #}
+          <form id="formCompilaCustom" method="POST" style="display:none">
+            <input type="hidden" name="significato_custom" id="inputSignificatoCustom">
+          </form>
+
           {# Modal selezione variante testo prescrizione #}
           <div class="modal fade" id="modalVarianteTesto" tabindex="-1">
             <div class="modal-dialog">
@@ -262,15 +267,23 @@
                     <div class="spinner-border spinner-border-sm text-primary me-2"></div>Carico varianti...
                   </div>
                   <div id="varianteContenuto" style="display:none">
-                    <div id="varianteNessuna" class="alert alert-info" style="display:none">
+                    <div id="varianteNessuna" class="alert alert-info mb-2" style="display:none">
                       <i class="bi bi-info-circle me-2"></i>
-                      Nessun testo configurato per questo tipo di ausilio.
-                      Verrà generato il PDF con le sezioni vuote.
+                      Nessun testo configurato per questo ausilio. Scrivi direttamente qui sotto.
                     </div>
                     <div id="varianteLista" style="display:none">
                       <p class="mb-1 small">Spunta le varianti da includere per <strong id="varianteAusilioLabel"></strong>
                         <span class="text-muted">(i testi vengono uniti in sequenza)</span>:</p>
                       <div id="varianteCheckbox" class="d-flex flex-column gap-2 mt-2"></div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label small fw-semibold mb-1">
+                        <i class="bi bi-pencil-square me-1 text-primary"></i>Significato terapeutico
+                        <span class="text-muted fw-normal">(modificabile prima di generare)</span>
+                      </label>
+                      <textarea id="significatoCustom" class="form-control form-control-sm" rows="5"
+                                placeholder="Seleziona una variante per caricare il testo, oppure scrivi direttamente..."
+                                oninput="aggiornaBottoneCompila()"></textarea>
                     </div>
                   </div>
                 </div>
@@ -279,7 +292,7 @@
                   <button class="btn btn-outline-secondary" onclick="compilaSenzaTesto()">
                     <i class="bi bi-file-earmark me-1"></i> Senza testo
                   </button>
-                  <button id="btnCompilaConTesto" class="btn btn-primary" onclick="compilaConVarianti()" disabled>
+                  <button id="btnCompilaConTesto" class="btn btn-primary" onclick="compilaGeneraPDF()" disabled>
                     <i class="bi bi-download me-1"></i> Genera PDF
                   </button>
                 </div>
@@ -518,16 +531,19 @@ function compilaSenzaTesto() {
   }, 300);
 }
 
+let _varianteAusilioCorrente = '';
+
 async function apriModalVariante(templateId, ausilio, praticaId) {
   _varianteUrlBase = `/compila/${templateId}/${praticaId}`;
+  _varianteAusilioCorrente = ausilio;
 
   // Reset UI
   document.getElementById('varianteLoading').style.display    = '';
   document.getElementById('varianteContenuto').style.display  = 'none';
   document.getElementById('varianteNessuna').style.display    = 'none';
   document.getElementById('varianteLista').style.display      = 'none';
+  document.getElementById('significatoCustom').value          = '';
   document.getElementById('btnCompilaConTesto').disabled      = true;
-  document.getElementById('btnCompilaSenzaTesto').href        = _varianteUrlBase;
 
   new bootstrap.Modal(document.getElementById('modalVarianteTesto')).show();
 
@@ -565,26 +581,40 @@ async function apriModalVariante(templateId, ausilio, praticaId) {
   }
 }
 
-function aggiornaBottoneCompila() {
-  const selezionate = document.querySelectorAll('.variante-check:checked').length;
-  document.getElementById('btnCompilaConTesto').disabled = (selezionate === 0);
+async function aggiornaBottoneCompila() {
+  const nomi = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
+  if (nomi.length > 0 && _varianteAusilioCorrente) {
+    try {
+      const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
+      const r = await fetch(`/api/testi-prescrizione/anteprima?ausilio=${encodeURIComponent(_varianteAusilioCorrente)}&${params}`);
+      const data = await r.json();
+      document.getElementById('significatoCustom').value = data.testo || '';
+    } catch(e) {}
+  }
+  const hasTesto = document.getElementById('significatoCustom').value.trim().length > 0;
+  document.getElementById('btnCompilaConTesto').disabled = !hasTesto;
 }
 
-function compilaConVarianti() {
-  const nomi = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
-  if (!nomi.length) return;
-  const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
-  const url = `${_varianteUrlBase}?${params}`;
-  // Chiudi modal, poi scarica dopo breve delay
+function compilaGeneraPDF() {
+  const testo = document.getElementById('significatoCustom').value.trim();
+  const nomi  = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
   const modal = bootstrap.Modal.getInstance(document.getElementById('modalVarianteTesto'));
   if (modal) modal.hide();
   setTimeout(() => {
-    const a = document.createElement('a');
-    a.href = url;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    if (testo) {
+      const form = document.getElementById('formCompilaCustom');
+      form.action = _varianteUrlBase;
+      document.getElementById('inputSignificatoCustom').value = testo;
+      form.submit();
+    } else if (nomi.length) {
+      const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
+      const a = document.createElement('a');
+      a.href = `${_varianteUrlBase}?${params}`;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   }, 300);
 }
 

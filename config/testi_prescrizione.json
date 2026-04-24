@@ -30,5 +30,83 @@
       "modi_impiego": "Giornaliero a tolleranza",
       "controindicazioni": "Nessuno"
     }
+  ],
+  "Deambulatore": [
+    {
+      "nome": "Standard",
+      "significato": "Il deambulatore è indispensabile per garantire al paziente la deambulazione autonoma in sicurezza, riducendo il rischio di cadute e consentendo il mantenimento della stazione eretta e della capacità di spostamento. Il dispositivo supporta il carico degli arti inferiori e favorisce il recupero funzionale nell'ambito del percorso riabilitativo.",
+      "modi_impiego": "Uso giornaliero, a tolleranza individuale, negli spostamenti interni ed esterni al domicilio.",
+      "controindicazioni": "Nessuna"
+    },
+    {
+      "nome": "Con seduta",
+      "significato": "Il deambulatore con seduta è indispensabile per il paziente che necessita di supporto alla deambulazione con possibilità di soste frequenti. Il dispositivo consente il mantenimento dell'autonomia negli spostamenti e riduce il rischio di cadute, permettendo il riposo durante il percorso senza dover ricorrere a sedute esterne.",
+      "modi_impiego": "Uso giornaliero, a tolleranza individuale, con utilizzo della seduta nelle fasi di riposo.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Leggera": [
+    {
+      "nome": "Standard",
+      "significato": "La carrozzina manuale leggera è indispensabile per consentire al paziente gli spostamenti autonomi o assistiti in ambito domestico ed extradomestico, garantendo la mobilità nelle attività di vita quotidiana. Il dispositivo, grazie alle sue caratteristiche di leggerezza e maneggevolezza, facilita la gestione da parte del caregiver e favorisce l'inclusione sociale del paziente.",
+      "modi_impiego": "Uso giornaliero per tutti gli spostamenti interni ed esterni al domicilio.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Super leggera": [
+    {
+      "nome": "Standard",
+      "significato": "La carrozzina manuale superleggera è indispensabile per consentire al paziente la massima autonomia negli spostamenti in ambito domestico ed extradomestico. Il dispositivo, grazie all'elevata leggerezza e alle caratteristiche ergonomiche, riduce l'affaticamento durante la propulsione e favorisce la partecipazione alle attività di vita quotidiana e sociale.",
+      "modi_impiego": "Uso giornaliero per tutti gli spostamenti interni ed esterni al domicilio, con propulsione autonoma.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Basculante Posturale": [
+    {
+      "nome": "Standard",
+      "significato": "La carrozzina basculante posturale è indispensabile per il paziente che necessita di un supporto posturale globale con gestione del tono muscolare patologico. Il sistema di basculamento consente la redistribuzione delle pressioni di contatto, la prevenzione di lesioni da pressione e il miglioramento del comfort respiratorio e digestivo, permettendo al tempo stesso gli spostamenti assistiti.",
+      "modi_impiego": "Uso giornaliero per tutti gli spostamenti assistiti; angolo di basculamento regolato sulla base delle indicazioni del team riabilitativo.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Bascula su Misura": [
+    {
+      "nome": "Standard",
+      "significato": "La carrozzina basculante su misura è indispensabile per il paziente con gravi disabilità posturali che richiedono un sistema personalizzato di supporto e contenimento. La configurazione su misura garantisce un posizionamento corretto del tronco, del bacino e degli arti, prevenendo le deformità secondarie e le complicanze da posizionamento scorretto, consentendo al contempo gli spostamenti assistiti.",
+      "modi_impiego": "Uso giornaliero con supervisione del caregiver; regolazioni effettuate da tecnico ortopedico specializzato.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Propulsore": [
+    {
+      "nome": "Standard",
+      "significato": "Il propulsore elettrico è indispensabile per garantire al paziente la mobilità autonoma, compensando il deficit di forza agli arti superiori che non consente la propulsione manuale della carrozzina. Il dispositivo consente la partecipazione alle attività di vita quotidiana e l'inclusione sociale, riducendo il carico assistenziale sul caregiver.",
+      "modi_impiego": "Uso giornaliero per tutti gli spostamenti interni ed esterni al domicilio, secondo le capacità cognitive e motorie del paziente.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Montascale": [
+    {
+      "nome": "Standard",
+      "significato": "Il montascale è indispensabile per consentire al paziente il superamento di barriere architettoniche (scale) che impediscono l'accesso al proprio domicilio o agli ambienti di vita quotidiana. Il dispositivo garantisce la sicurezza durante il trasferimento sulle scale, riducendo il rischio di cadute e consentendo l'accesso agli ambienti in assenza di ascensore o rampa.",
+      "modi_impiego": "Utilizzo assistito da caregiver formato; numero di utilizzi giornalieri variabile in base alle esigenze del paziente.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Passeggino posturale": [
+    {
+      "nome": "Standard",
+      "significato": "Il passeggino posturale è indispensabile per garantire al paziente in età pediatrica un corretto posizionamento durante gli spostamenti, prevenendo le deformità secondarie e supportando il controllo del tronco e del capo. Il dispositivo consente la partecipazione del bambino alle attività di vita quotidiana e agli spostamenti in ambienti esterni, garantendo comfort e sicurezza.",
+      "modi_impiego": "Uso giornaliero per tutti gli spostamenti esterni al domicilio; regolazioni effettuate da tecnico ortopedico specializzato.",
+      "controindicazioni": "Nessuna"
+    }
+  ],
+  "Postura Pediatrica": [
+    {
+      "nome": "Standard",
+      "significato": "Il sistema di postura pediatrica è indispensabile per garantire al paziente in età evolutiva un corretto allineamento posturale nelle attività di vita quotidiana, prevenendo l'insorgenza o il peggioramento di deformità secondarie a patologie neuromuscolari o ortopediche. Il dispositivo su misura supporta lo sviluppo delle competenze motorie e favorisce la partecipazione alle attività educative e ricreative.",
+      "modi_impiego": "Uso giornaliero secondo le indicazioni del team riabilitativo; regolazioni periodiche in base alla crescita del bambino.",
+      "controindicazioni": "Nessuna"
+    }
   ]
 }

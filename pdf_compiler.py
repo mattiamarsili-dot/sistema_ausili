@@ -140,7 +140,12 @@ def _arricchisci_dati(dati: dict) -> dict:
     dati["iva_importo"]  = _fmt_euro(iva_voci)
     dati["totale_finale"] = _fmt_euro(round(subtotale_voci + iva_voci, 2))
 
-    # Testi predefiniti per Prescrizione Cloude, associati al tipo di ausilio
+    # Testo significato personalizzato dall'utente (ha priorità sul JSON)
+    if dati.get("significato_custom", "").strip():
+        _espandi_testo(dati, "significato_riga", dati["significato_custom"].strip(), 6, 118)
+        return dati
+
+    # Testi predefiniti per Prescrizione, associati al tipo di ausilio
     testi_path = os.path.join(os.path.dirname(__file__), "config", "testi_prescrizione.json")
     if os.path.isfile(testi_path):
         try:
@@ -166,7 +171,7 @@ def _arricchisci_dati(dati: dict) -> dict:
                 def _unisci(campo):
                     parti = [v.get(campo, "").strip() for v in selezionate if v.get(campo, "").strip()]
                     return "\n\n".join(parti)
-                _espandi_testo(dati, "significato_riga", _unisci("significato"), 5, 118)
+                _espandi_testo(dati, "significato_riga", _unisci("significato"), 6, 118)
                 _espandi_testo(dati, "modi_riga",        _unisci("modi_impiego"), 6, 118)
                 _espandi_testo(dati, "controindicazioni_riga", _unisci("controindicazioni"), 2, 118)
         except Exception:
