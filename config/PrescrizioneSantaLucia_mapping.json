@@ -2,7 +2,7 @@
   "_tipo": "form",
   "_note": "Prescrizione Altra Mobilità — Santa Lucia — AcroForm 15 righe voci, 5 righe significato terapeutico + diagnosi (pag.2)",
   "_font_overrides": {
-    "Sign. Terap": "/Helv 8 Tf 0 g"
+    "Sign. Terap": "/Helv 7 Tf 0 g"
   },
   "campi": {
     "Cognome":       "cliente.cognome",
