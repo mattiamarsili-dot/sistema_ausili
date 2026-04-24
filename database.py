@@ -297,7 +297,7 @@ def save_pratica(data, id=None):
               "descrizione_ausilio","importo_preventivo","importo_liquidato",
               "data_autorizzazione","data_fornitura",
               "data_segnalazione","data_valutazione","data_prescrizione","data_ordine",
-              "note"]
+              "note","significato_terapeutico"]
     values = [data.get(f, "") or None for f in fields]
     if id:
         set_clause = ", ".join(f"{f}=?" for f in fields)

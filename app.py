@@ -427,7 +427,7 @@ def compila_pdf(template_id, pratica_id):
         "voci": voci,
         "data_oggi": __import__("datetime").date.today().strftime("%d/%m/%Y"),
         "variante_testo": request.args.getlist("variante"),
-        "significato_custom": request.form.get("significato_custom", ""),
+        "significato_custom": request.form.get("significato_custom", "") or request.args.get("significato_custom", ""),
     }
 
     try:

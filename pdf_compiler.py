@@ -140,9 +140,11 @@ def _arricchisci_dati(dati: dict) -> dict:
     dati["iva_importo"]  = _fmt_euro(iva_voci)
     dati["totale_finale"] = _fmt_euro(round(subtotale_voci + iva_voci, 2))
 
-    # Testo significato personalizzato dall'utente (ha priorità sul JSON)
-    if dati.get("significato_custom", "").strip():
-        _espandi_testo(dati, "significato_riga", dati["significato_custom"].strip(), 6, 118)
+    # Significato terapeutico: da pratica.significato_terapeutico o da significato_custom (query param)
+    sig = (dati.get("pratica") or {}).get("significato_terapeutico", "") or ""
+    sig = sig.strip() or dati.get("significato_custom", "").strip()
+    if sig:
+        _espandi_testo(dati, "significato_riga", sig, 6, 118)
         return dati
 
     # Testi predefiniti per Prescrizione, associati al tipo di ausilio

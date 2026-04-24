@@ -216,6 +216,14 @@
         <textarea name="note" class="form-control" rows="3" placeholder="Note sulla pratica…">{{ pratica.note or '' }}</textarea>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-header"><i class="bi bi-file-medical me-2"></i>Significato terapeutico <span class="text-muted fw-normal small">(compilato automaticamente nel PDF prescrizione)</span></div>
+      <div class="card-body">
+        <textarea name="significato_terapeutico" class="form-control" rows="5"
+                  placeholder="Descrivi il significato terapeutico del dispositivo prescritto…">{{ pratica.significato_terapeutico or '' }}</textarea>
+      </div>
+    </div>
   </div>
 
   <!-- Genera PDF (solo in modifica) -->
@@ -232,18 +240,10 @@
               <div class="card-body d-flex flex-column">
                 <div class="fw-semibold mb-1">{{ t.nome_template }}</div>
                 <div class="text-muted small mb-2">{{ t.tipo_documento or '' }} — {{ t.descrizione or '' }}</div>
-                {% if 'Prescrizione' in t.nome_template %}
-                <button type="button"
-                        class="btn btn-sm btn-outline-primary mt-auto"
-                        onclick="apriModalVariante({{ t.id }}, '{{ pratica.ausilio_richiesto or '' }}', '{{ pratica.id }}')">
-                  <i class="bi bi-download me-1"></i> Genera PDF
-                </button>
-                {% else %}
                 <a href="{{ url_for('compila_pdf', template_id=t.id, pratica_id=pratica.id) }}"
                    class="btn btn-sm btn-outline-primary mt-auto">
                   <i class="bi bi-download me-1"></i> Genera PDF
                 </a>
-                {% endif %}
               </div>
             </div>
           </div>
@@ -521,14 +521,7 @@ let _varianteUrlBase = '';
 function compilaSenzaTesto() {
   const modal = bootstrap.Modal.getInstance(document.getElementById('modalVarianteTesto'));
   if (modal) modal.hide();
-  setTimeout(() => {
-    const a = document.createElement('a');
-    a.href = _varianteUrlBase;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }, 300);
+  window.location.href = _varianteUrlBase;
 }
 
 let _varianteAusilioCorrente = '';
@@ -600,22 +593,13 @@ function compilaGeneraPDF() {
   const nomi  = [...document.querySelectorAll('.variante-check:checked')].map(c => c.value);
   const modal = bootstrap.Modal.getInstance(document.getElementById('modalVarianteTesto'));
   if (modal) modal.hide();
-  setTimeout(() => {
-    if (testo) {
-      const form = document.getElementById('formCompilaCustom');
-      form.action = _varianteUrlBase;
-      document.getElementById('inputSignificatoCustom').value = testo;
-      form.submit();
-    } else if (nomi.length) {
-      const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
-      const a = document.createElement('a');
-      a.href = `${_varianteUrlBase}?${params}`;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  }, 300);
+
+  if (testo) {
+    window.location.href = `${_varianteUrlBase}?significato_custom=${encodeURIComponent(testo)}`;
+  } else if (nomi.length) {
+    const params = nomi.map(n => `variante=${encodeURIComponent(n)}`).join('&');
+    window.location.href = `${_varianteUrlBase}?${params}`;
+  }
 }
 
 async function caricaDatiCliente(clienteId, forza = false) {
