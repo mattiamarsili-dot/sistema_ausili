@@ -144,7 +144,7 @@ def _arricchisci_dati(dati: dict) -> dict:
     sig = (dati.get("pratica") or {}).get("significato_terapeutico", "") or ""
     sig = sig.strip() or dati.get("significato_custom", "").strip()
     if sig:
-        _espandi_testo(dati, "significato_riga", sig, 6, 118)
+        _espandi_testo(dati, "significato_riga", sig, 6, 135)
         return dati
 
     # Testi predefiniti per Prescrizione, associati al tipo di ausilio
@@ -173,7 +173,7 @@ def _arricchisci_dati(dati: dict) -> dict:
                 def _unisci(campo):
                     parti = [v.get(campo, "").strip() for v in selezionate if v.get(campo, "").strip()]
                     return "\n\n".join(parti)
-                _espandi_testo(dati, "significato_riga", _unisci("significato"), 6, 118)
+                _espandi_testo(dati, "significato_riga", _unisci("significato"), 6, 135)
                 _espandi_testo(dati, "modi_riga",        _unisci("modi_impiego"), 6, 118)
                 _espandi_testo(dati, "controindicazioni_riga", _unisci("controindicazioni"), 2, 118)
         except Exception:
@@ -250,14 +250,24 @@ def get_pdf_form_fields(pdf_path: str) -> list[dict]:
         return [{"errore": str(e)}]
 
 
-def _imposta_font_campi(writer: "PdfWriter", da_string: str = "/Helv 10 Tf 0 g") -> None:
-    """Imposta il Default Appearance (font e dimensione) su tutti i campi AcroForm."""
+def _imposta_font_campi(writer: "PdfWriter", da_string: str = "/Helv 10 Tf 0 g",
+                        overrides: dict = None) -> None:
+    """Imposta il Default Appearance su tutti i campi AcroForm.
+    overrides: {sottostringa_nome_campo: da_string} per font diversi per campo.
+    """
     from pypdf.generic import NameObject, create_string_object
 
     def _processa(field_ref):
         try:
             field = field_ref.get_object()
-            field[NameObject("/DA")] = create_string_object(da_string)
+            nome = str(field.get("/T", ""))
+            da = da_string
+            if overrides:
+                for pattern, pattern_da in overrides.items():
+                    if pattern in nome:
+                        da = pattern_da
+                        break
+            field[NameObject("/DA")] = create_string_object(da)
             if "/Kids" in field:
                 for kid in field["/Kids"]:
                     _processa(kid)
@@ -272,7 +282,8 @@ def _imposta_font_campi(writer: "PdfWriter", da_string: str = "/Helv 10 Tf 0 g")
                 _processa(field_ref)
 
 
-def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: str) -> str:
+def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: str,
+                     font_overrides: dict = None) -> str:
     """
     Compila un PDF con campi AcroForm.
     mappatura: {nome_campo_pdf: chiave_in_dati}
@@ -285,8 +296,7 @@ def compila_form_pdf(pdf_path: str, mappatura: dict, dati: dict, output_path: st
     writer = PdfWriter()
     writer.append(reader)
 
-    # Forza Helvetica 10pt (equivalente Arial) su tutti i campi
-    _imposta_font_campi(writer, "/Helv 10 Tf 0 g")
+    _imposta_font_campi(writer, "/Helv 10 Tf 0 g", overrides=font_overrides)
 
     field_values = {}
     for campo_pdf, chiave_dati in mappatura.items():
@@ -513,7 +523,8 @@ def compila_pdf(template_record: dict, dati: dict) -> str:
         return compila_overlay_pdf(pdf_path, overlay_config, dati, output_path)
     else:
         campi = mappatura.get("campi", {})
-        return compila_form_pdf(pdf_path, campi, dati, output_path)
+        font_overrides = mappatura.get("_font_overrides", {})
+        return compila_form_pdf(pdf_path, campi, dati, output_path, font_overrides=font_overrides)
 
 
 def inspect_pdf(pdf_path: str) -> dict:
