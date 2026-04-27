@@ -518,13 +518,19 @@ def compila_pdf(template_record: dict, dati: dict) -> str:
         return compila_preventivo_pdf(pdf_path, dati, output_path)
 
     if tipo == "overlay":
-        # Filtra solo i campi reali (ignora chiavi con _ come _desc, _note)
         overlay_config = [c for c in mappatura.get("campi", []) if not c.get("chiave_dati", "").startswith("_")]
         return compila_overlay_pdf(pdf_path, overlay_config, dati, output_path)
     else:
         campi = mappatura.get("campi", {})
         font_overrides = mappatura.get("_font_overrides", {})
-        return compila_form_pdf(pdf_path, campi, dati, output_path, font_overrides=font_overrides)
+        result_path = compila_form_pdf(pdf_path, campi, dati, output_path, font_overrides=font_overrides)
+        # Se il mapping ha _overlay, applica testo aggiuntivo via ReportLab sul PDF già compilato
+        overlay_extra = mappatura.get("_overlay", [])
+        if overlay_extra:
+            result_path = compila_overlay_pdf(result_path, overlay_extra, dati, output_path + "_ov.pdf")
+            import shutil; shutil.move(result_path, output_path)
+            result_path = output_path
+        return result_path
 
 
 def inspect_pdf(pdf_path: str) -> dict:

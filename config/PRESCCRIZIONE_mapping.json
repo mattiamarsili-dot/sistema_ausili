@@ -2,7 +2,7 @@
   "_tipo": "form",
   "_note": "Prescrizione Altra Mobilità — AcroForm 15 righe voci, 6 righe significato terapeutico (pag.2)",
   "_font_overrides": {
-    "Signf. Terapeutico": "/Helv 7 Tf 0 g"
+    "Signf. Terapeutico": "/Helv 8 Tf 0 g"
   },
   "campi": {
     "Cognome":    "cliente.cognome",
