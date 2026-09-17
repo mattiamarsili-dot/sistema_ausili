@@ -58,15 +58,15 @@
         {"codice_iso": "12.27.91.021", "descrizione": "Schienale Regolabile", "quantita": 1, "prezzo_unitario": 335.00},
         {"codice_iso": "12.27.91.024", "descrizione": "Sedile Rigido, Per Base Di Mobilità", "quantita": 1, "prezzo_unitario": 167.00},
         {"codice_iso": "12.27.91.030", "descrizione": "Cinghia a 45° Sul Bacino", "quantita": 1, "prezzo_unitario": 130.00},
+        {"codice_iso": "12.27.91.033", "descrizione": "Cinghia a Bretellaggio", "quantita": 1, "prezzo_unitario": 130.00},
         {"codice_iso": "12.27.91.036", "descrizione": "Appoggiatesta Regolabile", "quantita": 1, "prezzo_unitario": 455.60},
+        {"codice_iso": "12.27.91.039", "descrizione": "Appoggiagambe a Lat", "quantita": 1, "prezzo_unitario": 175.00},
+        {"codice_iso": "12.27.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 280.00},
         {"codice_iso": "18.09.21.012", "descrizione": "Modulo Posturale Per Bacino", "quantita": 1, "prezzo_unitario": 980.00},
         {"codice_iso": "18.09.21.015", "descrizione": "Modulo Posturale Per Tronco", "quantita": 1, "prezzo_unitario": 980.00},
         {"codice_iso": "18.09.21.021", "descrizione": "Modulo Posturale Per Arto Inferiore (Singolo)", "quantita": 2, "prezzo_unitario": 290.00},
         {"codice_iso": "18.09.21.024", "descrizione": "Modulo Posturale Per Arto Superiore (Singolo)", "quantita": 2, "prezzo_unitario": 235.00},
-        {"codice_iso": "18.09.90.948", "descrizione": "Assemblaggio Base Di Mobilità Basculante", "quantita": 1, "prezzo_unitario": 110.00},
-        {"codice_iso": "12.27.91.051", "descrizione": "Tavolino Con Incavo", "quantita": 1, "prezzo_unitario": 280.00},
-        {"codice_iso": "12.27.91.039", "descrizione": "Appoggiagambe a Lat", "quantita": 1, "prezzo_unitario": 175.00},
-        {"codice_iso": "12.27.91.027", "descrizione": "Cinghia Pettorale Imbottita", "quantita": 1, "prezzo_unitario": 130.00}
+        {"codice_iso": "18.09.90.948", "descrizione": "Assemblaggio Base Di Mobilità Basculante", "quantita": 1, "prezzo_unitario": 110.00}
       ]
     },
     {
