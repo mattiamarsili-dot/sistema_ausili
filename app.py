@@ -1,6 +1,7 @@
 import os
 import json
 import threading
+import urllib.parse
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 import database as db
 import pdf_compiler as pdf_mod
@@ -8,6 +9,8 @@ import lettore_documenti as lettore
 
 app = Flask(__name__)
 app.secret_key = "ausili_secret_2024"
+
+WHATSAPP_NUMERO = "393403951866"  # Altra Mobilità — 340 39 51 866
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "data", "pdf_templates")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -649,12 +652,54 @@ def api_airtable_salva_chiave():
     return jsonify({"ok": True})
 
 
+# ── QUESTIONARIO SELEZIONE AUSILIO (pubblico, nessun salvataggio su DB) ──────
+
+@app.route("/questionario", methods=["GET", "POST"])
+def questionario_ausilio():
+    if request.method == "POST":
+        dati = {
+            "nome_cognome": (request.form.get("nome_cognome") or "").strip(),
+            "telefono": (request.form.get("telefono") or "").strip(),
+            "data_nascita": (request.form.get("data_nascita") or "").strip(),
+            "citta": (request.form.get("citta") or "").strip(),
+            "centro": (request.form.get("centro") or "").strip(),
+            "asl_competente": (request.form.get("asl_competente") or "").strip(),
+            "medico": (request.form.get("medico") or "").strip(),
+            "ausilio": (request.form.get("ausilio") or "").strip(),
+            "note": (request.form.get("note") or "").strip(),
+        }
+        messaggio = _formatta_messaggio_questionario(dati)
+        wa_link = f"https://wa.me/{WHATSAPP_NUMERO}?text={urllib.parse.quote(messaggio)}"
+        return render_template("questionario_risultato.html",
+                               dati=dati, messaggio=messaggio, wa_link=wa_link)
+    return render_template("questionario.html", centri=CENTRI_LIST, ausilii=AUSILII_LIST)
+
+
+def _formatta_messaggio_questionario(dati):
+    righe = [
+        "Richiesta informazioni ausilio",
+        "",
+        f"Nome e cognome: {dati['nome_cognome'] or '—'}",
+        f"Telefono: {dati['telefono'] or '—'}",
+        f"Data di nascita: {dati['data_nascita'] or '—'}",
+        f"Città: {dati['citta'] or '—'}",
+        f"Centro di riferimento: {dati['centro'] or '—'}",
+        f"ASL competente: {dati['asl_competente'] or '—'}",
+        f"Medico prescrittore: {dati['medico'] or '—'}",
+        f"Ausilio di interesse: {dati['ausilio'] or '—'}",
+        "",
+        "Note:",
+        dati["note"] or "—",
+    ]
+    return "\n".join(righe)
+
+
 # ── DRIVE BROWSER ────────────────────────────────────────────────────────────
 
 DRIVE_BASE = os.path.expanduser(
     "~/Library/CloudStorage/GoogleDrive-altramobilita@gmail.com/Il mio Drive"
 )
-IS_CLOUD = bool(os.environ.get("RAILWAY_ENVIRONMENT"))
+IS_CLOUD = bool(os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER"))
 
 # Cartelle preferite mostrate sulla homepage Drive (percorsi relativi a DRIVE_BASE)
 DRIVE_PREFERITI = [
@@ -768,5 +813,5 @@ def drive_file():
 if __name__ == "__main__":
     db.init_db()
     port = int(os.environ.get("PORT", 5001))
-    debug = os.environ.get("RAILWAY_ENVIRONMENT") is None  # debug solo in locale
+    debug = not IS_CLOUD  # debug solo in locale
     app.run(debug=debug, host="0.0.0.0", port=port)

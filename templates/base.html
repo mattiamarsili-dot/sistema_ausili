@@ -196,6 +196,10 @@
   <a href="{{ url_for('testi_prescrizione') }}" class="nav-link {% if request.endpoint == 'testi_prescrizione' %}active{% endif %}">
     <i class="bi bi-file-text"></i> Testi Prescrizione
   </a>
+  <div class="section-label">Pubblico</div>
+  <a href="{{ url_for('questionario_ausilio') }}" class="nav-link" target="_blank" rel="noopener">
+    <i class="bi bi-whatsapp" style="color:#25D366;"></i> Questionario pazienti
+  </a>
   <div class="section-label">Drive & Airtable</div>
   <a href="{{ url_for('drive') }}" class="nav-link {% if request.endpoint in ['drive','drive_file'] %}active{% endif %}">
     <i class="bi bi-folder2-open" style="color:#fbbc04;"></i> Sfoglia Drive
