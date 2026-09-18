@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riepilogo richiesta — Altra Mobilità</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body { background: #f4f6fb; }
+    .wrap { max-width: 620px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .card { border: none; box-shadow: 0 1px 6px rgba(0,0,0,.08); border-radius: 0.75rem; }
+    .card-header { background: #1a2540; color: #fff; border-radius: 0.75rem 0.75rem 0 0 !important; }
+    pre.riepilogo {
+      white-space: pre-wrap; background: #f8f9fb; border: 1px solid #e9ecef;
+      border-radius: 0.5rem; padding: 1rem; font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="text-center mb-3">
+    <i class="bi bi-check-circle-fill" style="color:#25D366; font-size:2rem;"></i>
+    <h4 class="fw-bold mt-2 mb-0">Riepilogo pronto</h4>
+    <div class="text-muted small">Controlla i dati e invia su WhatsApp</div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header"><i class="bi bi-file-text me-2"></i>Il tuo riepilogo</div>
+    <div class="card-body">
+      <pre class="riepilogo">{{ messaggio }}</pre>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2">
+    <a href="{{ wa_link }}" target="_blank" rel="noopener" class="btn btn-lg" style="background:#25D366; color:#fff;">
+      <i class="bi bi-whatsapp me-1"></i> Invia su WhatsApp
+    </a>
+    <a href="{{ url_for('questionario_ausilio') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i> Correggi i dati
+    </a>
+  </div>
+
+  <p class="text-center text-muted small mt-3">
+    Si aprirà WhatsApp (o WhatsApp Web) con il messaggio già scritto: dovrai solo premere
+    "Invia". Non conserviamo questi dati sui nostri server.
+  </p>
+</div>
+</body>
+</html>

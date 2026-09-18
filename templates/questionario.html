@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Richiedi informazioni ausilio — Altra Mobilità</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    body { background: #f4f6fb; }
+    .wrap { max-width: 620px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    .card { border: none; box-shadow: 0 1px 6px rgba(0,0,0,.08); border-radius: 0.75rem; }
+    .card-header { background: #1a2540; color: #fff; border-radius: 0.75rem 0.75rem 0 0 !important; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="text-center mb-3">
+    <i class="bi bi-activity" style="color:#1a2540; font-size:2rem;"></i>
+    <h4 class="fw-bold mt-2 mb-0">Altra Mobilità</h4>
+    <div class="text-muted small">Richiesta informazioni ausilio</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><i class="bi bi-clipboard2-pulse me-2"></i>Compila i tuoi dati</div>
+    <div class="card-body">
+      <p class="text-muted small">
+        Compila i campi qui sotto: alla fine potrai inviarci il riepilogo direttamente su WhatsApp
+        con un tocco. Un nostro operatore ti ricontatterà per la valutazione.
+      </p>
+      <form method="post">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Nome e cognome *</label>
+            <input type="text" name="nome_cognome" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Data di nascita</label>
+            <input type="date" name="data_nascita" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Telefono *</label>
+            <input type="tel" name="telefono" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Città</label>
+            <input type="text" name="citta" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Centro di riferimento</label>
+            <select name="centro" class="form-select">
+              <option value="">— Non so / altro —</option>
+              {% for c in centri %}
+                <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">ASL competente</label>
+            <input type="text" name="asl_competente" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Medico prescrittore</label>
+            <input type="text" name="medico" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Ausilio di cui pensi di aver bisogno</label>
+            <select name="ausilio" class="form-select">
+              <option value="">— Non so, vorrei una consulenza —</option>
+              {% for a in ausilii %}
+                <option value="{{ a }}">{{ a }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Descrivi brevemente la tua esigenza</label>
+            <textarea name="note" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="d-grid mt-4">
+          <button type="submit" class="btn btn-lg" style="background:#25D366; color:#fff;">
+            <i class="bi bi-whatsapp me-1"></i> Prepara riepilogo e invia su WhatsApp
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <p class="text-center text-muted small mt-3">
+    I tuoi dati non vengono salvati su nessun server: verranno inviati solo tramite il messaggio
+    WhatsApp che invierai tu stesso al passo successivo.
+  </p>
+</div>
+</body>
+</html>

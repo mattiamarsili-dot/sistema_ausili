@@ -131,6 +131,34 @@
     .stat-card .stat-label { font-size: 0.82rem; opacity: 0.85; }
     table th { font-size: 0.78rem; text-transform: uppercase; color: #6c757d; letter-spacing: 0.04em; }
     .btn-sm { font-size: 0.8rem; }
+
+    /* ── CONTATTI RAPIDI (WhatsApp / Email) ── */
+    .contatti-rapidi {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+    .contatti-rapidi a {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,.25);
+      text-decoration: none;
+      transition: transform .15s;
+    }
+    .contatti-rapidi a:hover { transform: scale(1.08); color: #fff; }
+    .contatti-rapidi a.whatsapp { background: #25D366; }
+    .contatti-rapidi a.email { background: #1a2540; }
+    @media (max-width: 767px) {
+      .contatti-rapidi { bottom: 74px; right: 1rem; }
+      .contatti-rapidi a { width: 46px; height: 46px; font-size: 1.3rem; }
+    }
   </style>
 </head>
 <body>
@@ -167,6 +195,10 @@
   </a>
   <a href="{{ url_for('testi_prescrizione') }}" class="nav-link {% if request.endpoint == 'testi_prescrizione' %}active{% endif %}">
     <i class="bi bi-file-text"></i> Testi Prescrizione
+  </a>
+  <div class="section-label">Pubblico</div>
+  <a href="{{ url_for('questionario_ausilio') }}" class="nav-link" target="_blank" rel="noopener">
+    <i class="bi bi-whatsapp" style="color:#25D366;"></i> Questionario pazienti
   </a>
   <div class="section-label">Drive & Airtable</div>
   <a href="{{ url_for('drive') }}" class="nav-link {% if request.endpoint in ['drive','drive_file'] %}active{% endif %}">
@@ -210,6 +242,16 @@
   {% endwith %}
 
   {% block content %}{% endblock %}
+</div>
+
+{# ── CONTATTI RAPIDI (numero e mail Altra Mobilità) ── #}
+<div class="contatti-rapidi">
+  <a href="mailto:altra.mobilita.cico@gmail.com" class="email" title="Scrivi a altra.mobilita.cico@gmail.com" target="_blank" rel="noopener">
+    <i class="bi bi-envelope-fill"></i>
+  </a>
+  <a href="https://wa.me/393403951866" class="whatsapp" title="Scrivi su WhatsApp: 340 39 51 866" target="_blank" rel="noopener">
+    <i class="bi bi-whatsapp"></i>
+  </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
